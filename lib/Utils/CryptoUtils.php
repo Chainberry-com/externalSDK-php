@@ -18,7 +18,10 @@ class CryptoUtils
     private static function stringifyWithSortedKeys($obj): string
     {
         if (is_array($obj)) {
-            if (array_keys($obj) !== range(0, count($obj) - 1)) {
+            if (empty($obj)) {
+                // Empty array - return empty array notation
+                return '[]';
+            } elseif (array_keys($obj) !== range(0, count($obj) - 1)) {
                 // Associative array - sort keys
                 ksort($obj);
                 $entries = [];
