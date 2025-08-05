@@ -29,10 +29,10 @@ composer install
 Set the following environment variables:
 
 ```bash
-export EXTERNAL_API_ENVIRONMENT=sandbox  # or production
-export EXTERNAL_API_CLIENT_ID=your_client_id
-export EXTERNAL_API_CLIENT_SECRET=your_client_secret
-export EXTERNAL_API_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
+export CB_API_ENVIRONMENT=sandbox  # or production
+export CB_API_CLIENT_ID=your_client_id
+export CB_API_CLIENT_SECRET=your_client_secret
+export CB_API_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
 ```
 
 ### Configuration Array
@@ -79,11 +79,11 @@ BerrySdk::init();
 // Create a deposit
 $depositParams = [
     'amount' => '100.00',
-    'currency' => 'USDT',
+    'currency' => 'USDC',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
     'tradingAccountLogin' => 'user123',
-    'paymentGatewayName' => 'USDT', // Optional
-    'paymentCurrency' => 'USDT'     // Optional
+    'paymentGatewayName' => 'ETH', // Optional
+    'paymentCurrency' => 'USDC'     // Optional
 ];
 
 try {

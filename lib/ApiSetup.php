@@ -184,16 +184,16 @@ StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
         $missingFields = [];
 
         if (empty($finalConfig->environment)) {
-            $missingFields[] = "Environment is invalid. Should be SANDBOX or PRODUCTION. Please provide either in the config parameter 'environment' or as environment variable EXTERNAL_API_ENVIRONMENT.";
+            $missingFields[] = "Environment is invalid. Should be SANDBOX or PRODUCTION. Please provide either in the config parameter 'environment' or as environment variable CB_API_ENVIRONMENT.";
         }
         if (empty($finalConfig->clientId)) {
-            $missingFields[] = "Client Id is missing. Please provide either in the config parameter 'clientId' or as environment variable EXTERNAL_API_CLIENT_ID.";
+            $missingFields[] = "Client Id is missing. Please provide either in the config parameter 'clientId' or as environment variable CB_API_CLIENT_ID.";
         }
         if (empty($finalConfig->clientSecret)) {
-            $missingFields[] = "Client Secret is missing. Please provide either in the config parameter 'clientSecret' or as environment variable EXTERNAL_API_CLIENT_SECRET.";
+            $missingFields[] = "Client Secret is missing. Please provide either in the config parameter 'clientSecret' or as environment variable CB_API_CLIENT_SECRET.";
         }
         if (empty($finalConfig->privateKey)) {
-            $missingFields[] = "Private Key is missing. Please provide either in the config parameter 'privateKey' or as environment variable EXTERNAL_API_PRIVATE_KEY.";
+            $missingFields[] = "Private Key is missing. Please provide either in the config parameter 'privateKey' or as environment variable CB_API_PRIVATE_KEY.";
         }
 
         if (!empty($missingFields)) {
@@ -239,12 +239,12 @@ StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
     private function getConfigFromEnv(): ExternalApiConfig
     {
         $config = new ExternalApiConfig();
-        $envEnvironment = getenv('EXTERNAL_API_ENVIRONMENT');
+        $envEnvironment = getenv('CB_API_ENVIRONMENT');
 
         $config->environment = $envEnvironment ? $this->parseEnvironment($envEnvironment) : null;
-        $config->clientId = getenv('EXTERNAL_API_CLIENT_ID');
-        $config->clientSecret = getenv('EXTERNAL_API_CLIENT_SECRET');
-        $privateKey = getenv('EXTERNAL_API_PRIVATE_KEY');
+        $config->clientId = getenv('CB_API_CLIENT_ID');
+        $config->clientSecret = getenv('CB_API_CLIENT_SECRET');
+        $privateKey = getenv('CB_API_PRIVATE_KEY');
         if ($privateKey) {
             // Convert \n to actual newlines if they exist
             $config->privateKey = str_replace('\\n', "\n", $privateKey);
@@ -284,10 +284,10 @@ StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
         $missingVars = [];
 
         if (empty($this->config->clientId)) {
-            $missingVars[] = "Client Id is missing. Please provide either in the config parameter 'clientId' or as environment variable EXTERNAL_API_CLIENT_ID.";
+            $missingVars[] = "Client Id is missing. Please provide either in the config parameter 'clientId' or as environment variable CB_API_CLIENT_ID.";
         }
         if (empty($this->config->clientSecret)) {
-            $missingVars[] = "Client Secret is missing. Please provide either in the config parameter 'clientSecret' or as environment variable EXTERNAL_API_CLIENT_SECRET.";
+            $missingVars[] = "Client Secret is missing. Please provide either in the config parameter 'clientSecret' or as environment variable CB_API_CLIENT_SECRET.";
         }
 
         if (!empty($missingVars)) {

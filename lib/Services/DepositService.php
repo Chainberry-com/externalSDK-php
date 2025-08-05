@@ -220,11 +220,11 @@ class DepositService
     public function getDepositWithEnvAuth(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\GetDepositDto
     {
         // Check for required environment variables
-        $clientId = getenv('EXTERNAL_API_CLIENT_ID');
-        $clientSecret = getenv('EXTERNAL_API_CLIENT_SECRET');
+        $clientId = getenv('CB_API_CLIENT_ID');
+        $clientSecret = getenv('CB_API_CLIENT_SECRET');
 
         if (empty($clientId) || empty($clientSecret)) {
-            throw new \Exception("Missing required environment variables: EXTERNAL_API_CLIENT_ID and EXTERNAL_API_CLIENT_SECRET");
+            throw new \Exception("Missing required environment variables: CB_API_CLIENT_ID and CB_API_CLIENT_SECRET");
         }
 
         return $this->getDeposit($paymentId, $maxRetries);
