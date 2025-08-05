@@ -30,14 +30,10 @@ To install the bindings via [Composer](https://getcomposer.org/), add the follow
 
 ```json
 {
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/GIT_USER_ID/GIT_REPO_ID.git"
-    }
-  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "require": {
-    "GIT_USER_ID/GIT_REPO_ID": "*@dev"
+    "chainberry/external-sdk-php": "dev-main"
   }
 }
 ```
