@@ -121,6 +121,35 @@ try {
 }
 ```
 
+### Create a Withdrawal
+
+```php
+<?php
+
+use OpenAPI\Client\BerrySdk;
+
+// Initialize the SDK
+BerrySdk::init();
+
+// Create a withdrawal
+$withdrawParams = [
+    'amount' => '50.00',
+    'currency' => 'USDT',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'tradingAccountLogin' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6', // Required
+    'paymentGatewayName' => 'USDT', // Optional
+    'withdrawCurrency' => 'USDT'     // Optional
+];
+
+try {
+    $withdraw = BerrySdk::createWithdraw($withdrawParams);
+    echo "Withdrawal created: " . $withdraw['paymentId'];
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
+```
+
 ### Get Deposit Information
 
 ```php
@@ -137,6 +166,27 @@ $paymentId = 'your_payment_id';
 try {
     $deposit = BerrySdk::getDeposit($paymentId);
     echo "Deposit status: " . $deposit['status'];
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
+```
+
+### Get Withdrawal Information
+
+```php
+<?php
+
+use OpenAPI\Client\BerrySdk;
+
+// Initialize the SDK
+BerrySdk::init();
+
+// Get withdrawal information
+$paymentId = 'your_payment_id';
+
+try {
+    $withdraw = BerrySdk::getWithdraw($paymentId);
+    echo "Withdrawal status: " . $withdraw['status'];
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -230,6 +280,41 @@ $deposit = $depositService->createDeposit([
 
 // Get deposit with retry logic
 $depositInfo = $depositService->getDeposit('payment_id', 3); // 3 retries
+```
+
+### Using the Withdraw Service
+
+```php
+<?php
+
+use OpenAPI\Client\Services\WithdrawService;
+
+// Initialize the SDK first
+BerrySdk::init();
+
+// Create withdraw service
+$withdrawService = new WithdrawService();
+
+// Get signed withdrawal request
+$signedRequest = $withdrawService->getSignedWithdrawRequest([
+    'amount' => '50.00',
+    'currency' => 'USDT',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'tradingAccountLogin' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
+]);
+
+// Create withdrawal
+$withdraw = $withdrawService->createWithdraw([
+    'amount' => '50.00',
+    'currency' => 'USDT',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'tradingAccountLogin' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
+]);
+
+// Get withdrawal with retry logic
+$withdrawInfo = $withdrawService->getWithdraw('payment_id', 3); // 3 retries
 ```
 
 ### Error Handling
@@ -413,6 +498,8 @@ Class | Method | HTTP request | Description
 - `getLogger(): Logger` - Get the logger instance
 - `createDeposit(array $params): array` - Create a deposit
 - `getDeposit(string $paymentId, int $maxRetries = 2): array` - Get deposit information
+- `createWithdraw(array $params): array` - Create a withdrawal
+- `getWithdraw(string $paymentId, int $maxRetries = 2): array` - Get withdrawal information
 - `signPayload(array $payload, string $privateKey): array` - Sign a payload
 - `verifySignature(array $dataWithSignature, string $publicKey): bool` - Verify a signature
 - `reset(): void` - Reset the SDK instance
@@ -428,6 +515,7 @@ Class | Method | HTTP request | Description
 - `getConfig(): ?ExternalApiConfig` - Get current configuration
 - `getAssetApi(): AssetApi` - Get Asset API instance
 - `getDepositsApi(): DepositsApi` - Get Deposits API instance
+- `getWithdrawApi(): WithdrawApi` - Get Withdraw API instance
 - `getOauthApi(): OauthApi` - Get OAuth API instance
 - `getTestApi(): TestApi` - Get Test API instance
 
@@ -439,6 +527,15 @@ Class | Method | HTTP request | Description
 - `createDeposit(array $params): array` - Create and submit deposit
 - `getDeposit(string $paymentId, int $maxRetries = 2): array` - Get deposit with retry
 - `getDepositWithEnvAuth(string $paymentId, int $maxRetries = 2): array` - Get deposit with env auth
+
+### WithdrawService Class
+
+#### Methods
+
+- `getSignedWithdrawRequest(array $params): array` - Get signed withdrawal request
+- `createWithdraw(array $params): array` - Create and submit withdrawal
+- `getWithdraw(string $paymentId, int $maxRetries = 2): array` - Get withdrawal with retry
+- `getWithdrawWithEnvAuth(string $paymentId, int $maxRetries = 2): array` - Get withdrawal with env auth
 
 ### CryptoUtils Class
 

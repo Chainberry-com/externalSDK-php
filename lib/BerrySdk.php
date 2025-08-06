@@ -3,6 +3,7 @@
 namespace OpenAPI\Client;
 
 use OpenAPI\Client\Services\DepositService;
+use OpenAPI\Client\Services\WithdrawService;
 use OpenAPI\Client\Utils\Logger;
 use OpenAPI\Client\Utils\CryptoUtils;
 use OpenAPI\Client\Errors\ConfigurationError;
@@ -90,6 +91,35 @@ class BerrySdk
     {
         $depositService = new DepositService();
         return $depositService->getDeposit($paymentId, $maxRetries);
+    }
+
+    /**
+     * Create a withdrawal
+     * 
+     * @param array $params Withdrawal parameters
+     * @return \OpenAPI\Client\Model\WithdrawDto Withdrawal response
+     * @throws BadRequestError
+     * @throws UnauthorizedError
+     */
+    public static function createWithdraw(array $params): \OpenAPI\Client\Model\WithdrawDto
+    {
+        $withdrawService = new WithdrawService();
+        return $withdrawService->createWithdraw($params);
+    }
+
+    /**
+     * Get withdrawal information
+     * 
+     * @param string $paymentId Payment ID
+     * @param int $maxRetries Maximum retry attempts
+     * @return \OpenAPI\Client\Model\GetWithdrawDto Withdrawal information
+     * @throws BadRequestError
+     * @throws UnauthorizedError
+     */
+    public static function getWithdraw(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\GetWithdrawDto
+    {
+        $withdrawService = new WithdrawService();
+        return $withdrawService->getWithdraw($paymentId, $maxRetries);
     }
 
     /**

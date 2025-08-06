@@ -31,6 +31,7 @@ require_once __DIR__ . '/Utils/Validation.php';
 
 // Services classes
 require_once __DIR__ . '/Services/DepositService.php';
+require_once __DIR__ . '/Services/WithdrawService.php';
 
 // Main SDK classes
 require_once __DIR__ . '/ApiSetup.php';

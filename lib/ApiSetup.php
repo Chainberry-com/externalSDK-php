@@ -6,6 +6,7 @@ use OpenAPI\Client\Api\AssetApi;
 use OpenAPI\Client\Api\DepositsApi;
 use OpenAPI\Client\Api\OauthApi;
 use OpenAPI\Client\Api\TestApi;
+use OpenAPI\Client\Api\WithdrawApi;
 use OpenAPI\Client\Configuration;
 use OpenAPI\Client\Errors\BadRequestError;
 use OpenAPI\Client\Errors\ConfigurationError;
@@ -58,6 +59,7 @@ class ApiSetup
     private ?DepositsApi $depositsApi = null;
     private ?OauthApi $oauthApi = null;
     private ?TestApi $testApi = null;
+    private ?WithdrawApi $withdrawApi = null;
     private ?string $accessToken = null;
 
     private const DEFAULT_BASE_URLS = [
@@ -122,6 +124,7 @@ StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
         $this->depositsApi = new DepositsApi(null, $this->configuration);
         $this->oauthApi = new OauthApi(null, $this->configuration);
         $this->testApi = new TestApi(null, $this->configuration);
+        $this->withdrawApi = new WithdrawApi(null, $this->configuration);
 
         try {
             $this->testInit();
@@ -383,6 +386,16 @@ StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
     public function getTestApi(): TestApi
     {
         return $this->testApi;
+    }
+
+    /**
+     * Get Withdraw API instance
+     * 
+     * @return WithdrawApi
+     */
+    public function getWithdrawApi(): WithdrawApi
+    {
+        return $this->withdrawApi;
     }
 
     /**
