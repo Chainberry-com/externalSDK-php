@@ -19,7 +19,7 @@ use OpenAPI\Client\Utils\CryptoUtils;
  */
 class Environment
 {
-    public const SANDBOX = 'sandbox';
+    public const STAGING = 'staging';
     public const PRODUCTION = 'production';
 }
 
@@ -63,21 +63,12 @@ class ApiSetup
     private ?string $accessToken = null;
 
     private const DEFAULT_BASE_URLS = [
-        Environment::SANDBOX => 'http://192.168.0.226:3001/api/v1',
-        Environment::PRODUCTION => 'https://api.chainberry.com/api/v1',
+        Environment::STAGING => 'https://api-stg.chainberry.com/api/v1',
+        Environment::PRODUCTION => '',
     ];
 
     private const CHAINBERRY_PUBLIC_KEYS = [
-        Environment::SANDBOX => "-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwvCN/n7etTqjNJ0M0JmU
-cGPaXoc6ttN8f3KT02ZV8CpGOV3ekUIwgvXw6mCq4jz2mmGkfnjneuWbWMru3w4I
-6xngWdMeJqcVoOviTPn9wuASnsAu4imMxOxRoyLNDqstOg1g0N4wISaCazmCwJXW
-LwavgC++lnO/iVXHVln5+DDCSSICkII6RGeYoXMev/SvvV1FoQ7tnC6Z069Uh+Uy
-5NYHZrQ/lVIoq9fi0WLrhMzDWYR5ncDjeKntmMb2B2h7Prs3/RXx7bvV1BzSBkE9
-nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
-0QIDAQAB
------END PUBLIC KEY-----",
-        Environment::PRODUCTION => "-----BEGIN PUBLIC KEY-----
+        Environment::STAGING => "-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu9hu+/AZCRVnf3dapRJX
 fZEGaIO7vm8OBHhGNW+2T9ZKHYJw5Mid2V5IQ3TSyVMr8GfSiaxK94z7mGXFKfkt
 3mQE0MLN8lwTGWC7RdtswUoCB91KNP4vhq06VGLC6F+TlcNoIk4F2o30JwZgixDy
@@ -86,6 +77,7 @@ BAWPWFPwzfiIjwOk1udbeMuQ07uRJWwrLevZ7OuMxZvYees/Wg5+25R1OzOY/jis
 StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
 0QIDAQAB
 -----END PUBLIC KEY-----",
+        Environment::PRODUCTION => "",
     ];
 
     /**
@@ -187,7 +179,7 @@ StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
         $missingFields = [];
 
         if (empty($finalConfig->environment)) {
-            $missingFields[] = "Environment is invalid. Should be SANDBOX or PRODUCTION. Please provide either in the config parameter 'environment' or as environment variable CB_API_ENVIRONMENT.";
+            $missingFields[] = "Environment is invalid. Should be STAGING or PRODUCTION. Please provide either in the config parameter 'environment' or as environment variable CB_API_ENVIRONMENT.";
         }
         if (empty($finalConfig->clientId)) {
             $missingFields[] = "Client Id is missing. Please provide either in the config parameter 'clientId' or as environment variable CB_API_CLIENT_ID.";
@@ -229,9 +221,9 @@ StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
     private function getChainberryPublicKey(?string $environment): string
     {
         if (empty($environment)) {
-            return self::CHAINBERRY_PUBLIC_KEYS[Environment::SANDBOX];
+            return self::CHAINBERRY_PUBLIC_KEYS[Environment::STAGING];
         }
-        return self::CHAINBERRY_PUBLIC_KEYS[$environment] ?? self::CHAINBERRY_PUBLIC_KEYS[Environment::SANDBOX];
+        return self::CHAINBERRY_PUBLIC_KEYS[$environment] ?? self::CHAINBERRY_PUBLIC_KEYS[Environment::STAGING];
     }
 
     /**
@@ -267,8 +259,8 @@ StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
     private function parseEnvironment(string $env): ?string
     {
         $normalized = strtolower($env);
-        if (in_array($normalized, ['sandbox', 'dev', 'development'])) {
-            return Environment::SANDBOX;
+        if (in_array($normalized, ['staging', 'dev', 'development'])) {
+            return Environment::STAGING;
         }
         if (in_array($normalized, ['production', 'prod'])) {
             return Environment::PRODUCTION;

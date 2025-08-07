@@ -29,7 +29,7 @@ composer install
 Set the following environment variables:
 
 ```bash
-export CB_API_ENVIRONMENT=sandbox  # or production
+export CB_API_ENVIRONMENT=staging  # or production
 export CB_API_CLIENT_ID=your_client_id
 export CB_API_CLIENT_SECRET=your_client_secret
 export CB_API_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
@@ -41,7 +41,7 @@ Alternatively, you can pass configuration directly:
 
 ```php
 $config = [
-    'environment' => 'sandbox', // or 'production'
+    'environment' => 'staging', // or 'production'
     'clientId' => 'your_client_id',
     'clientSecret' => 'your_client_secret',
     'privateKey' => '-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'
@@ -207,7 +207,7 @@ $apiSetup = ApiSetup::getInstance();
 
 // Initialize with configuration
 $apiSetup->init([
-    'environment' => Environment::SANDBOX,
+    'environment' => Environment::STAGING,
     'clientId' => 'your_client_id',
     'clientSecret' => 'your_client_secret',
     'privateKey' => 'your_private_key'

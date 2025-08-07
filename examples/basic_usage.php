@@ -16,7 +16,7 @@ echo "=== BerrySdk PHP Basic Usage Example ===\n\n";
 
 // Configuration - you can use environment variables or pass config directly
 $config = [
-    'environment' => 'sandbox', // or 'production'
+    'environment' => 'staging', // or 'production'
     'clientId' => 'your_client_id_here',
     'clientSecret' => 'your_client_secret_here',
     'privateKey' => "-----BEGIN PRIVATE KEY-----\n" .
