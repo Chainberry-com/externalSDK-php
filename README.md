@@ -430,6 +430,9 @@ For direct API access without the BerrySdk wrapper, you can use the generated AP
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
+
+
+
 $apiInstance = new OpenAPI\Client\Api\AssetApi(
     // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
     // This is optional, `GuzzleHttp\Client` will be used as default.
@@ -442,35 +445,58 @@ try {
 } catch (Exception $e) {
     echo 'Exception when calling AssetApi->assetControllerGetSupportedAssets: ', $e->getMessage(), PHP_EOL;
 }
+
 ```
 
 ## API Endpoints
 
-All URIs are relative to *http://localhost:3001/api/v1*
+All URIs are relative to _http://localhost:3001/api/v1_
 
-Class | Method | HTTP request | Description
------------- | ------------- | ------------- | -------------
-*AssetApi* | [**assetControllerGetSupportedAssets**](docs/Api/AssetApi.md#assetcontrollergetsupportedassets) | **GET** /asset | 
-*DepositsApi* | [**depositControllerCreateDeposit**](docs/Api/DepositsApi.md#depositcontrollercreatedeposit) | **POST** /deposits | 
-*DepositsApi* | [**depositControllerGetDeposit**](docs/Api/DepositsApi.md#depositcontrollergetdeposit) | **GET** /deposits/{paymentId} | 
-*DepositsApi* | [**depositControllerGetDepositPayment**](docs/Api/DepositsApi.md#depositcontrollergetdepositpayment) | **GET** /deposits/payments/{paymentId} | 
-*DepositsApi* | [**depositControllerSetupSupportingAssets**](docs/Api/DepositsApi.md#depositcontrollersetupsupportingassets) | **GET** /deposits/setup-supporting-assets | 
-*DepositsApi* | [**depositControllerSyncUpWithFireblocks**](docs/Api/DepositsApi.md#depositcontrollersyncupwithfireblocks) | **GET** /deposits/sync-up-with-fireblocks | 
-*HealthApi* | [**appControllerHealth**](docs/Api/HealthApi.md#appcontrollerhealth) | **GET** /health | Get the health of the API
-*OauthApi* | [**oAuthControllerToken**](docs/Api/OauthApi.md#oauthcontrollertoken) | **POST** /oauth/token | 
-*PartnersApi* | [**partnerControllerGetCurrentPartner**](docs/Api/PartnersApi.md#partnercontrollergetcurrentpartner) | **GET** /partners/me | 
-*PublicKeyApi* | [**publicKeyControllerDownloadPublicKey**](docs/Api/PublicKeyApi.md#publickeycontrollerdownloadpublickey) | **GET** /public-key | 
-*TestApi* | [**testControllerInitParams**](docs/Api/TestApi.md#testcontrollerinitparams) | **POST** /test/init-params | Test the init params with JWT token and apiToken
-*TestApi* | [**testControllerTestCallback**](docs/Api/TestApi.md#testcontrollertestcallback) | **POST** /test/callback | 
-*TestApi* | [**testControllerTestJwt**](docs/Api/TestApi.md#testcontrollertestjwt) | **GET** /test/jwt | Test the API with JWT token
-*TestApi* | [**testControllerTestSignatureGeneration**](docs/Api/TestApi.md#testcontrollertestsignaturegeneration) | **POST** /test/signature-generation | Test the API with signature generation
-*TestApi* | [**testControllerTestSignatureVerificationMiddleware**](docs/Api/TestApi.md#testcontrollertestsignatureverificationmiddleware) | **POST** /test/signature-verification | Test the API with signature verification middleware. Requires apiToken in body. ApiToken is partnerId
-*WebhookApi* | [**webhookControllerHandleWebhook**](docs/Api/WebhookApi.md#webhookcontrollerhandlewebhook) | **POST** /webhook | 
-*WithdrawApi* | [**withdrawControllerCreateWithdraw**](docs/Api/WithdrawApi.md#withdrawcontrollercreatewithdraw) | **POST** /withdraw | 
-*WithdrawApi* | [**withdrawControllerGetWithdraw**](docs/Api/WithdrawApi.md#withdrawcontrollergetwithdraw) | **GET** /withdraw/{paymentId} | 
+| Class               | Method                                                                                                                         | HTTP request                              | Description                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| _AssetApi_          | [**assetControllerGetSupportedAssets**](docs/Api/AssetApi.md#assetcontrollergetsupportedassets)                                | **GET** /asset                            |
+| _AutoConversionApi_ | [**autoConversionControllerAutoConversion**](docs/Api/AutoConversionApi.md#autoconversioncontrollerautoconversion)             | **POST** /auto-conversion                 |
+| _BinanceApi_        | [**binanceControllerExecuteTradingWorkflow**](docs/Api/BinanceApi.md#binancecontrollerexecutetradingworkflow)                  | **POST** /binance/workflow/execute        |
+| _BinanceApi_        | [**binanceControllerGetAveragePrice**](docs/Api/BinanceApi.md#binancecontrollergetaverageprice)                                | **GET** /binance/average-price/{symbol}   |
+| _BinanceApi_        | [**binanceControllerGetAveragePrices**](docs/Api/BinanceApi.md#binancecontrollergetaverageprices)                              | **GET** /binance/average-prices           |
+| _BinanceApi_        | [**binanceControllerGetCommonAveragePrices**](docs/Api/BinanceApi.md#binancecontrollergetcommonaverageprices)                  | **GET** /binance/common-average-prices    |
+| _BinanceApi_        | [**binanceControllerGetWithdrawFee**](docs/Api/BinanceApi.md#binancecontrollergetwithdrawfee)                                  | **GET** /binance/withdraw-fee/{currency}  |
+| _BinanceApi_        | [**binanceControllerValidateSymbol**](docs/Api/BinanceApi.md#binancecontrollervalidatesymbol)                                  | **GET** /binance/validate-symbol/{symbol} |
+| _BinanceApi_        | [**binanceControllerWithdrawToFireblocks**](docs/Api/BinanceApi.md#binancecontrollerwithdrawtofireblocks)                      | **POST** /binance/withdraw                |
+| _DepositsApi_       | [**depositControllerCreateDeposit**](docs/Api/DepositsApi.md#depositcontrollercreatedeposit)                                   | **POST** /deposits                        |
+| _DepositsApi_       | [**depositControllerGetDeposit**](docs/Api/DepositsApi.md#depositcontrollergetdeposit)                                         | **GET** /deposits/{paymentId}             |
+| _DepositsApi_       | [**depositControllerGetDepositPayment**](docs/Api/DepositsApi.md#depositcontrollergetdepositpayment)                           | **GET** /deposits/payments/{paymentId}    |
+| _DepositsApi_       | [**depositControllerSetupSupportingAssets**](docs/Api/DepositsApi.md#depositcontrollersetupsupportingassets)                   | **GET** /deposits/setup-supporting-assets |
+| _DepositsApi_       | [**depositControllerSyncUpWithFireblocks**](docs/Api/DepositsApi.md#depositcontrollersyncupwithfireblocks)                     | **GET** /deposits/sync-up-with-fireblocks |
+| _HealthApi_         | [**appControllerHealth**](docs/Api/HealthApi.md#appcontrollerhealth)                                                           | **GET** /health                           | Get the health of the API                                                                             |
+| _KytApi_            | [**kytControllerHandleMonitorNotification**](docs/Api/KytApi.md#kytcontrollerhandlemonitornotification)                        | **POST** /kyt                             | Process KYT monitor notification                                                                      |
+| _OauthApi_          | [**oAuthControllerToken**](docs/Api/OauthApi.md#oauthcontrollertoken)                                                          | **POST** /oauth/token                     |
+| _PartnersApi_       | [**partnerControllerGetCurrentPartner**](docs/Api/PartnersApi.md#partnercontrollergetcurrentpartner)                           | **GET** /partners/me                      |
+| _PublicKeyApi_      | [**publicKeyControllerDownloadPublicKey**](docs/Api/PublicKeyApi.md#publickeycontrollerdownloadpublickey)                      | **GET** /public-key                       |
+| _SideshiftApi_      | [**sideShiftControllerCreateVariableShift**](docs/Api/SideshiftApi.md#sideshiftcontrollercreatevariableshift)                  | **POST** /sideshift/shifts/variable       |
+| _SideshiftApi_      | [**sideShiftControllerGetPair**](docs/Api/SideshiftApi.md#sideshiftcontrollergetpair)                                          | **GET** /sideshift/pair/{from}/{to}       |
+| _SideshiftApi_      | [**sideShiftControllerGetShift**](docs/Api/SideshiftApi.md#sideshiftcontrollergetshift)                                        | **GET** /sideshift/shifts/{shiftId}       |
+| _TestApi_           | [**testControllerInitParams**](docs/Api/TestApi.md#testcontrollerinitparams)                                                   | **POST** /test/init-params                | Test the init params with JWT token and apiToken                                                      |
+| _TestApi_           | [**testControllerTestCallback**](docs/Api/TestApi.md#testcontrollertestcallback)                                               | **POST** /test/callback                   |
+| _TestApi_           | [**testControllerTestJwt**](docs/Api/TestApi.md#testcontrollertestjwt)                                                         | **GET** /test/jwt                         | Test the API with JWT token                                                                           |
+| _TestApi_           | [**testControllerTestSignatureGeneration**](docs/Api/TestApi.md#testcontrollertestsignaturegeneration)                         | **POST** /test/signature-generation       | Test the API with signature generation                                                                |
+| _TestApi_           | [**testControllerTestSignatureVerificationMiddleware**](docs/Api/TestApi.md#testcontrollertestsignatureverificationmiddleware) | **POST** /test/signature-verification     | Test the API with signature verification middleware. Requires apiToken in body. ApiToken is partnerId |
+| _WebhookApi_        | [**webhookControllerHandleWebhook**](docs/Api/WebhookApi.md#webhookcontrollerhandlewebhook)                                    | **POST** /webhook                         |
+| _WithdrawApi_       | [**withdrawControllerCreateWithdraw**](docs/Api/WithdrawApi.md#withdrawcontrollercreatewithdraw)                               | **POST** /withdraw                        |
+| _WithdrawApi_       | [**withdrawControllerGetWithdraw**](docs/Api/WithdrawApi.md#withdrawcontrollergetwithdraw)                                     | **GET** /withdraw/{paymentId}             |
 
 ## Models
 
+- [AutoConversionRequestDto](docs/Model/AutoConversionRequestDto.md)
+- [AutoConversionResponseDto](docs/Model/AutoConversionResponseDto.md)
+- [BinanceControllerGetAveragePrice200Response](docs/Model/BinanceControllerGetAveragePrice200Response.md)
+- [BinanceControllerGetWithdrawFee200Response](docs/Model/BinanceControllerGetWithdrawFee200Response.md)
+- [BinanceControllerValidateSymbol200Response](docs/Model/BinanceControllerValidateSymbol200Response.md)
+- [BinanceOrderResponseDto](docs/Model/BinanceOrderResponseDto.md)
+- [BinanceWithdrawRequestDto](docs/Model/BinanceWithdrawRequestDto.md)
+- [BinanceWithdrawResponseDto](docs/Model/BinanceWithdrawResponseDto.md)
+- [BinanceWorkflowConfigDto](docs/Model/BinanceWorkflowConfigDto.md)
+- [BinanceWorkflowResponseDto](docs/Model/BinanceWorkflowResponseDto.md)
 - [DepositDto](docs/Model/DepositDto.md)
 - [DepositRequest](docs/Model/DepositRequest.md)
 - [GetDepositDto](docs/Model/GetDepositDto.md)
@@ -479,7 +505,13 @@ Class | Method | HTTP request | Description
 - [GetDepositPaymentDtoCryptoTransactionInfoInner](docs/Model/GetDepositPaymentDtoCryptoTransactionInfoInner.md)
 - [GetWithdrawDto](docs/Model/GetWithdrawDto.md)
 - [InitTestParamsDto](docs/Model/InitTestParamsDto.md)
+- [KytMonitorNotificationDto](docs/Model/KytMonitorNotificationDto.md)
 - [PartnerDto](docs/Model/PartnerDto.md)
+- [SideShiftPairResponseDto](docs/Model/SideShiftPairResponseDto.md)
+- [SideShiftShiftDepositDto](docs/Model/SideShiftShiftDepositDto.md)
+- [SideShiftShiftResponseDto](docs/Model/SideShiftShiftResponseDto.md)
+- [SideShiftVariableShiftRequestDto](docs/Model/SideShiftVariableShiftRequestDto.md)
+- [SideShiftVariableShiftResponseDto](docs/Model/SideShiftVariableShiftResponseDto.md)
 - [SuccessDto](docs/Model/SuccessDto.md)
 - [SupportedAssetDto](docs/Model/SupportedAssetDto.md)
 - [TokenRequestDto](docs/Model/TokenRequestDto.md)
@@ -560,6 +592,7 @@ Class | Method | HTTP request | Description
 ## Authorization
 
 Authentication schemes defined for the API:
+
 ### bearer
 
 - **Type**: Bearer authentication (JWT)
@@ -593,6 +626,6 @@ This project is licensed under the MIT License.
 
 This PHP package is automatically generated by the [OpenAPI Generator](https://openapi-generator.tech) project:
 
-- API version: `1.1`
-    - Generator version: `7.14.0`
+- API version: `1.15`
+  - Generator version: `7.14.0`
 - Build package: `org.openapitools.codegen.languages.PhpClientCodegen`

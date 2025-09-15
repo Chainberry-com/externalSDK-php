@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **final_currency** | **string** |  |
 **processing_fee** | **string** |  |
 **address** | **string** |  |
+**tag** | **string** |  |
 **final_amount** | **float** |  |
 **convert_ratio** | **float** |  |
 **temp_transaction_id** | **string** |  |

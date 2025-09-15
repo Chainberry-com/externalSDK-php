@@ -15,5 +15,6 @@ Name | Type | Description | Notes
 **conversion_rate** | **float** |  |
 **crypto_transaction_info** | [**\OpenAPI\Client\Model\GetDepositDtoCryptoTransactionInfoInner[]**](GetDepositDtoCryptoTransactionInfoInner.md) |  |
 **address** | **string** |  |
+**tag** | **string** |  |
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)
