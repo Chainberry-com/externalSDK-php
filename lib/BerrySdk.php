@@ -2,6 +2,7 @@
 
 namespace OpenAPI\Client;
 
+use OpenAPI\Client\Services\AutoConversionService;
 use OpenAPI\Client\Services\DepositService;
 use OpenAPI\Client\Services\WithdrawService;
 use OpenAPI\Client\Utils\Logger;
@@ -76,6 +77,20 @@ class BerrySdk
     {
         $depositService = new DepositService();
         return $depositService->createDeposit($params);
+    }
+
+    /**
+     * Create an auto conversion
+     * 
+     * @param array $params Auto conversion parameters
+     * @return \OpenAPI\Client\Model\AutoConversionResponseDto Auto conversion response
+     * @throws BadRequestError
+     * @throws UnauthorizedError
+     */
+    public static function createAutoConversion(array $params): \OpenAPI\Client\Model\AutoConversionResponseDto
+    {
+        $autoConversionService = new AutoConversionService();
+        return $autoConversionService->createAutoConversion($params);
     }
 
     /**

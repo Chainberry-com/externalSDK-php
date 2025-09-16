@@ -3,6 +3,7 @@
 namespace OpenAPI\Client;
 
 use OpenAPI\Client\Api\AssetApi;
+use OpenAPI\Client\Api\AutoConversionApi;
 use OpenAPI\Client\Api\DepositsApi;
 use OpenAPI\Client\Api\OauthApi;
 use OpenAPI\Client\Api\TestApi;
@@ -56,6 +57,7 @@ class ApiSetup
     private ?ExternalApiConfig $config = null;
     private ?Configuration $configuration = null;
     private ?AssetApi $assetApi = null;
+    private ?AutoConversionApi $autoConversionApi = null;
     private ?DepositsApi $depositsApi = null;
     private ?OauthApi $oauthApi = null;
     private ?TestApi $testApi = null;
@@ -64,7 +66,7 @@ class ApiSetup
 
     private const DEFAULT_BASE_URLS = [
         Environment::STAGING => 'https://api-stg.chainberry.com/api/v1',
-        Environment::PRODUCTION => '',
+        Environment::PRODUCTION => 'https://api.chainberry.com/api/v1',
     ];
 
     private const CHAINBERRY_PUBLIC_KEYS = [
@@ -77,7 +79,15 @@ BAWPWFPwzfiIjwOk1udbeMuQ07uRJWwrLevZ7OuMxZvYees/Wg5+25R1OzOY/jis
 StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
 0QIDAQAB
 -----END PUBLIC KEY-----",
-        Environment::PRODUCTION => "",
+        Environment::PRODUCTION => "-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoxUR0G/8yIIkLWAivkgd
+2pMzGyk39uR4O/ZdqJ3vUSsmUBoAHpahzyfn/hT/pZC8/13KA1heB5LdTU91LzWg
+667nqd3fFgUx8g4b9BuOWEpBl/VNIbIj/nfU0QxW8s/KSJ8pmIeuYgCqhYiaCpLD
+2dpfbf7kMlzXci3kApqTMXiJTO5XHlGhhXpKggHwRIIglsK/lTxnw0MuskywV5gf
+V2sj6YxNpGQ+uaY3aO6yTGRU0ZBTrHfxJlsRSeiaTXxX9QhRUPjQRAk5OuLrF5kO
+keEKz/U+LCYEW27a3AfFzs0d1D/zIxCEBCft/EwhMHqM+fnSSk/DdxFt63m789IO
+BwIDAQAB
+-----END PUBLIC KEY-----",
     ];
 
     /**
@@ -113,6 +123,7 @@ StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
 
         // Initialize API instances
         $this->assetApi = new AssetApi(null, $this->configuration);
+        $this->autoConversionApi = new AutoConversionApi(null, $this->configuration);
         $this->depositsApi = new DepositsApi(null, $this->configuration);
         $this->oauthApi = new OauthApi(null, $this->configuration);
         $this->testApi = new TestApi(null, $this->configuration);
@@ -348,6 +359,16 @@ StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
     public function getAssetApi(): AssetApi
     {
         return $this->assetApi;
+    }
+
+    /**
+     * Get Auto Conversion API instance
+     * 
+     * @return AutoConversionApi
+     */
+    public function getAutoConversionApi(): AutoConversionApi
+    {
+        return $this->autoConversionApi;
     }
 
     /**

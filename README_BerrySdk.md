@@ -6,6 +6,8 @@ This is a PHP implementation of the berrySdk functionality, providing easy integ
 
 - **API Setup & Configuration**: Easy initialization with environment variables or configuration arrays
 - **Deposit Management**: Create and retrieve deposits with automatic signature generation
+- **Withdrawal Management**: Create and retrieve withdrawals with automatic signature generation
+- **Auto Conversion**: Convert between different cryptocurrencies with automatic rate calculation
 - **Crypto Operations**: Sign payloads and verify signatures using RSA-SHA256
 - **Error Handling**: Comprehensive error classes for different types of errors
 - **Retry Logic**: Built-in retry mechanisms with exponential backoff
@@ -165,6 +167,37 @@ try {
 }
 ```
 
+### Create an Auto Conversion
+
+```php
+<?php
+
+use OpenAPI\Client\BerrySdk;
+
+// Initialize the SDK
+BerrySdk::init();
+
+// Create an auto conversion
+$autoConversionParams = [
+    'amount' => '100.00',
+    'currency' => 'USDT',           // Source currency
+    'paymentCurrency' => 'USDC',    // Target currency
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'tradingAccountLogin' => 'user123',
+    'paymentGatewayName' => 'BNB'   // Optional: payment gateway
+];
+
+try {
+    $autoConversion = BerrySdk::createAutoConversion($autoConversionParams);
+    echo "Auto conversion created: " . $autoConversion->getPaymentId();
+    echo "Checkout URL: " . $autoConversion->getCheckoutUrl();
+    echo "Conversion Rate: " . $autoConversion->getConversionRate();
+    echo "Final Amount: " . $autoConversion->getNetAmount();
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
+```
+
 ### Crypto Operations
 
 ```php
@@ -290,6 +323,49 @@ $withdraw = $withdrawService->createWithdraw([
 $withdrawInfo = $withdrawService->getWithdraw('payment_id', 3); // 3 retries
 ```
 
+### Using the Auto Conversion Service
+
+```php
+<?php
+
+use OpenAPI\Client\Services\AutoConversionService;
+
+// Initialize the SDK first
+BerrySdk::init();
+
+// Create auto conversion service
+$autoConversionService = new AutoConversionService();
+
+// Get signed auto conversion request
+$signedRequest = $autoConversionService->getSignedAutoConversionRequest([
+    'amount' => '100.00',
+    'currency' => 'USDT',           // Source currency
+    'paymentCurrency' => 'USDC',    // Target currency
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'tradingAccountLogin' => 'user123',
+    'paymentGatewayName' => 'BNB'   // Optional: payment gateway
+]);
+
+// Create auto conversion
+$autoConversion = $autoConversionService->createAutoConversion([
+    'amount' => '100.00',
+    'currency' => 'USDT',
+    'paymentCurrency' => 'USDC',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'tradingAccountLogin' => 'user123',
+    'paymentGatewayName' => 'BNB'
+]);
+
+// Access response properties
+echo "Payment ID: " . $autoConversion->getPaymentId();
+echo "Checkout URL: " . $autoConversion->getCheckoutUrl();
+echo "Conversion Rate: " . $autoConversion->getConversionRate();
+echo "Final Currency: " . $autoConversion->getFinalCurrency();
+echo "Transaction Amount: " . $autoConversion->getTransactionAmount();
+echo "Net Amount: " . $autoConversion->getNetAmount();
+echo "Processing Fee: " . $autoConversion->getProcessingFee();
+```
+
 ### Error Handling
 
 ```php
@@ -408,6 +484,7 @@ $logger->error('Error occurred', ['error' => $error]);
 - `getDeposit(string $paymentId, int $maxRetries = 2): array` - Get deposit information
 - `createWithdraw(array $params): array` - Create a withdrawal
 - `getWithdraw(string $paymentId, int $maxRetries = 2): array` - Get withdrawal information
+- `createAutoConversion(array $params): AutoConversionResponseDto` - Create an auto conversion
 - `signPayload(array $payload, string $privateKey): array` - Sign a payload
 - `verifySignature(array $dataWithSignature, string $publicKey): bool` - Verify a signature
 - `reset(): void` - Reset the SDK instance
@@ -424,6 +501,7 @@ $logger->error('Error occurred', ['error' => $error]);
 - `getAssetApi(): AssetApi` - Get Asset API instance
 - `getDepositsApi(): DepositsApi` - Get Deposits API instance
 - `getWithdrawApi(): WithdrawApi` - Get Withdraw API instance
+- `getAutoConversionApi(): AutoConversionApi` - Get Auto Conversion API instance
 - `getOauthApi(): OauthApi` - Get OAuth API instance
 - `getTestApi(): TestApi` - Get Test API instance
 
@@ -444,6 +522,32 @@ $logger->error('Error occurred', ['error' => $error]);
 - `createWithdraw(array $params): array` - Create and submit withdrawal
 - `getWithdraw(string $paymentId, int $maxRetries = 2): array` - Get withdrawal with retry
 - `getWithdrawWithEnvAuth(string $paymentId, int $maxRetries = 2): array` - Get withdrawal with env auth
+
+### AutoConversionService Class
+
+#### Methods
+
+- `getSignedAutoConversionRequest(array $params): array` - Get signed auto conversion request
+- `createAutoConversion(array $params): AutoConversionResponseDto` - Create and submit auto conversion
+
+#### Auto Conversion Parameters
+
+- `amount` (string, required) - Amount to convert
+- `currency` (string, required) - Source currency (BTC, ETH, USDT, USDC, BNB, LTC, TON)
+- `paymentCurrency` (string, required) - Target currency (BTC, ETH, USDT, USDC, BNB, LTC, TON)
+- `callbackUrl` (string, required) - Webhook URL for notifications
+- `tradingAccountLogin` (string, required) - Trading account identifier
+- `paymentGatewayName` (string, optional) - Payment gateway name (required for tokens like USDT/USDC)
+
+#### Auto Conversion Response Properties
+
+- `getPaymentId()` - Unique payment identifier
+- `getCheckoutUrl()` - URL for user to complete the conversion
+- `getConversionRate()` - Exchange rate used for conversion
+- `getFinalCurrency()` - Final currency after conversion
+- `getTransactionAmount()` - Original transaction amount
+- `getNetAmount()` - Amount after fees
+- `getProcessingFee()` - Processing fee charged
 
 ### CryptoUtils Class
 
