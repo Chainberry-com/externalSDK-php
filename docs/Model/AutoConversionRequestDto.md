@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **api_token** | **string** |  |
 **timestamp** | **float** |  |
 **signature** | **string** |  |
+**partner_payment_id** | **string** |  |
 **trading_account_login** | **string** |  |
 **payment_currency** | **string** | The currency to convert from |
 

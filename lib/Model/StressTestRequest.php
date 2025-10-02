@@ -1,6 +1,6 @@
 <?php
 /**
- * PartnerDto
+ * StressTestRequest
  *
  * PHP version 8.1
  *
@@ -32,7 +32,7 @@ use \ArrayAccess;
 use \OpenAPI\Client\ObjectSerializer;
 
 /**
- * PartnerDto Class Doc Comment
+ * StressTestRequest Class Doc Comment
  *
  * @category Class
  * @package  OpenAPI\Client
@@ -40,7 +40,7 @@ use \OpenAPI\Client\ObjectSerializer;
  * @link     https://openapi-generator.tech
  * @implements \ArrayAccess<string, mixed>
  */
-class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
+class StressTestRequest implements ModelInterface, ArrayAccess, \JsonSerializable
 {
     public const DISCRIMINATOR = null;
 
@@ -49,7 +49,7 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
       *
       * @var string
       */
-    protected static $openAPIModelName = 'PartnerDto';
+    protected static $openAPIModelName = 'StressTestRequest';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -57,8 +57,8 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
       * @var string[]
       */
     protected static $openAPITypes = [
-        'id' => 'string',
-        'name' => 'string'
+        'csv' => 'string',
+        'api_key' => 'string'
     ];
 
     /**
@@ -69,8 +69,8 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
       * @psalm-var array<string, string|null>
       */
     protected static $openAPIFormats = [
-        'id' => null,
-        'name' => null
+        'csv' => null,
+        'api_key' => null
     ];
 
     /**
@@ -79,8 +79,8 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
       * @var boolean[]
       */
     protected static array $openAPINullables = [
-        'id' => false,
-        'name' => false
+        'csv' => false,
+        'api_key' => false
     ];
 
     /**
@@ -169,8 +169,8 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $attributeMap = [
-        'id' => 'id',
-        'name' => 'name'
+        'csv' => 'csv',
+        'api_key' => 'apiKey'
     ];
 
     /**
@@ -179,8 +179,8 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $setters = [
-        'id' => 'setId',
-        'name' => 'setName'
+        'csv' => 'setCsv',
+        'api_key' => 'setApiKey'
     ];
 
     /**
@@ -189,8 +189,8 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $getters = [
-        'id' => 'getId',
-        'name' => 'getName'
+        'csv' => 'getCsv',
+        'api_key' => 'getApiKey'
     ];
 
     /**
@@ -250,8 +250,8 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     public function __construct(?array $data = null)
     {
-        $this->setIfExists('id', $data ?? [], null);
-        $this->setIfExists('name', $data ?? [], null);
+        $this->setIfExists('csv', $data ?? [], null);
+        $this->setIfExists('api_key', $data ?? [], null);
     }
 
     /**
@@ -281,11 +281,11 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
-        if ($this->container['id'] === null) {
-            $invalidProperties[] = "'id' can't be null";
+        if ($this->container['csv'] === null) {
+            $invalidProperties[] = "'csv' can't be null";
         }
-        if ($this->container['name'] === null) {
-            $invalidProperties[] = "'name' can't be null";
+        if ($this->container['api_key'] === null) {
+            $invalidProperties[] = "'api_key' can't be null";
         }
         return $invalidProperties;
     }
@@ -303,55 +303,55 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
 
 
     /**
-     * Gets id
+     * Gets csv
      *
      * @return string
      */
-    public function getId()
+    public function getCsv()
     {
-        return $this->container['id'];
+        return $this->container['csv'];
     }
 
     /**
-     * Sets id
+     * Sets csv
      *
-     * @param string $id id
+     * @param string $csv csv
      *
      * @return self
      */
-    public function setId($id)
+    public function setCsv($csv)
     {
-        if (is_null($id)) {
-            throw new \InvalidArgumentException('non-nullable id cannot be null');
+        if (is_null($csv)) {
+            throw new \InvalidArgumentException('non-nullable csv cannot be null');
         }
-        $this->container['id'] = $id;
+        $this->container['csv'] = $csv;
 
         return $this;
     }
 
     /**
-     * Gets name
+     * Gets api_key
      *
      * @return string
      */
-    public function getName()
+    public function getApiKey()
     {
-        return $this->container['name'];
+        return $this->container['api_key'];
     }
 
     /**
-     * Sets name
+     * Sets api_key
      *
-     * @param string $name name
+     * @param string $api_key api_key
      *
      * @return self
      */
-    public function setName($name)
+    public function setApiKey($api_key)
     {
-        if (is_null($name)) {
-            throw new \InvalidArgumentException('non-nullable name cannot be null');
+        if (is_null($api_key)) {
+            throw new \InvalidArgumentException('non-nullable api_key cannot be null');
         }
-        $this->container['name'] = $name;
+        $this->container['api_key'] = $api_key;
 
         return $this;
     }

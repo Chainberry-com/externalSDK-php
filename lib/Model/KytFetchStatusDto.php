@@ -1,6 +1,6 @@
 <?php
 /**
- * PartnerDto
+ * KytFetchStatusDto
  *
  * PHP version 8.1
  *
@@ -32,7 +32,7 @@ use \ArrayAccess;
 use \OpenAPI\Client\ObjectSerializer;
 
 /**
- * PartnerDto Class Doc Comment
+ * KytFetchStatusDto Class Doc Comment
  *
  * @category Class
  * @package  OpenAPI\Client
@@ -40,7 +40,7 @@ use \OpenAPI\Client\ObjectSerializer;
  * @link     https://openapi-generator.tech
  * @implements \ArrayAccess<string, mixed>
  */
-class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
+class KytFetchStatusDto implements ModelInterface, ArrayAccess, \JsonSerializable
 {
     public const DISCRIMINATOR = null;
 
@@ -49,7 +49,7 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
       *
       * @var string
       */
-    protected static $openAPIModelName = 'PartnerDto';
+    protected static $openAPIModelName = 'KytFetchStatusDto';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -57,8 +57,7 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
       * @var string[]
       */
     protected static $openAPITypes = [
-        'id' => 'string',
-        'name' => 'string'
+        'partner_id' => 'string'
     ];
 
     /**
@@ -69,8 +68,7 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
       * @psalm-var array<string, string|null>
       */
     protected static $openAPIFormats = [
-        'id' => null,
-        'name' => null
+        'partner_id' => null
     ];
 
     /**
@@ -79,8 +77,7 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
       * @var boolean[]
       */
     protected static array $openAPINullables = [
-        'id' => false,
-        'name' => false
+        'partner_id' => false
     ];
 
     /**
@@ -169,8 +166,7 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $attributeMap = [
-        'id' => 'id',
-        'name' => 'name'
+        'partner_id' => 'partnerId'
     ];
 
     /**
@@ -179,8 +175,7 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $setters = [
-        'id' => 'setId',
-        'name' => 'setName'
+        'partner_id' => 'setPartnerId'
     ];
 
     /**
@@ -189,8 +184,7 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $getters = [
-        'id' => 'getId',
-        'name' => 'getName'
+        'partner_id' => 'getPartnerId'
     ];
 
     /**
@@ -250,8 +244,7 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     public function __construct(?array $data = null)
     {
-        $this->setIfExists('id', $data ?? [], null);
-        $this->setIfExists('name', $data ?? [], null);
+        $this->setIfExists('partner_id', $data ?? [], null);
     }
 
     /**
@@ -281,11 +274,8 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
-        if ($this->container['id'] === null) {
-            $invalidProperties[] = "'id' can't be null";
-        }
-        if ($this->container['name'] === null) {
-            $invalidProperties[] = "'name' can't be null";
+        if ($this->container['partner_id'] === null) {
+            $invalidProperties[] = "'partner_id' can't be null";
         }
         return $invalidProperties;
     }
@@ -303,55 +293,28 @@ class PartnerDto implements ModelInterface, ArrayAccess, \JsonSerializable
 
 
     /**
-     * Gets id
+     * Gets partner_id
      *
      * @return string
      */
-    public function getId()
+    public function getPartnerId()
     {
-        return $this->container['id'];
+        return $this->container['partner_id'];
     }
 
     /**
-     * Sets id
+     * Sets partner_id
      *
-     * @param string $id id
+     * @param string $partner_id partner_id
      *
      * @return self
      */
-    public function setId($id)
+    public function setPartnerId($partner_id)
     {
-        if (is_null($id)) {
-            throw new \InvalidArgumentException('non-nullable id cannot be null');
+        if (is_null($partner_id)) {
+            throw new \InvalidArgumentException('non-nullable partner_id cannot be null');
         }
-        $this->container['id'] = $id;
-
-        return $this;
-    }
-
-    /**
-     * Gets name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->container['name'];
-    }
-
-    /**
-     * Sets name
-     *
-     * @param string $name name
-     *
-     * @return self
-     */
-    public function setName($name)
-    {
-        if (is_null($name)) {
-            throw new \InvalidArgumentException('non-nullable name cannot be null');
-        }
-        $this->container['name'] = $name;
+        $this->container['partner_id'] = $partner_id;
 
         return $this;
     }

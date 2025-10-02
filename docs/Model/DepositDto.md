@@ -13,6 +13,7 @@ Name | Type | Description | Notes
 **processing_fee** | **string** |  |
 **address** | **string** |  |
 **tag** | **string** |  |
+**partner_payment_id** | **string** |  |
 **checkout_url** | **string** |  |
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)

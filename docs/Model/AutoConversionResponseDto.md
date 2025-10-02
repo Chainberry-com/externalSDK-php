@@ -13,6 +13,7 @@ Name | Type | Description | Notes
 **processing_fee** | **string** |  |
 **address** | **string** |  |
 **tag** | **string** |  |
+**partner_payment_id** | **string** |  |
 **checkout_url** | **string** |  |
 **conversion_minimum_amount** | **string** |  | [optional]
 **conversion_maximum_amount** | **string** |  | [optional]

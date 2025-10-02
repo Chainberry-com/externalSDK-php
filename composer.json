@@ -1,18 +1,20 @@
 {
-    "name": "chainberry/external-sdk-php",
-    "version": "1.0.0",
-    "description": "Chainberry PHP SDK",
+    "description": "External API",
     "keywords": [
-        "chainberry",
-        "external-sdk",
-        "php"
+        "openapitools",
+        "openapi-generator",
+        "openapi",
+        "php",
+        "sdk",
+        "rest",
+        "api"
     ],
-    "homepage": "https://chainberry.com",
+    "homepage": "https://openapi-generator.tech",
     "license": "unlicense",
     "authors": [
         {
-            "name": "Chainberry",
-            "homepage": "https://chainberry.com"
+            "name": "OpenAPI",
+            "homepage": "https://openapi-generator.tech"
         }
     ],
     "require": {

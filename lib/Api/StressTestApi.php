@@ -1,6 +1,6 @@
 <?php
 /**
- * PartnersApi
+ * StressTestApi
  * PHP version 8.1
  *
  * @category Class
@@ -43,14 +43,14 @@ use OpenAPI\Client\HeaderSelector;
 use OpenAPI\Client\ObjectSerializer;
 
 /**
- * PartnersApi Class Doc Comment
+ * StressTestApi Class Doc Comment
  *
  * @category Class
  * @package  OpenAPI\Client
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech
  */
-class PartnersApi
+class StressTestApi
 {
     /**
      * @var ClientInterface
@@ -74,7 +74,7 @@ class PartnersApi
 
     /** @var string[] $contentTypes **/
     public const contentTypes = [
-        'partnerControllerGetCurrentPartner' => [
+        'stressTestControllerTest' => [
             'application/json',
         ],
     ];
@@ -126,32 +126,33 @@ class PartnersApi
     }
 
     /**
-     * Operation partnerControllerGetCurrentPartner
+     * Operation stressTestControllerTest
      *
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['partnerControllerGetCurrentPartner'] to see the possible values for this operation
+     * @param  \OpenAPI\Client\Model\StressTestRequest $stress_test_request stress_test_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['stressTestControllerTest'] to see the possible values for this operation
      *
      * @throws \OpenAPI\Client\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return \OpenAPI\Client\Model\PartnerDto
+     * @return void
      */
-    public function partnerControllerGetCurrentPartner(string $contentType = self::contentTypes['partnerControllerGetCurrentPartner'][0])
+    public function stressTestControllerTest($stress_test_request, string $contentType = self::contentTypes['stressTestControllerTest'][0])
     {
-        list($response) = $this->partnerControllerGetCurrentPartnerWithHttpInfo($contentType);
-        return $response;
+        $this->stressTestControllerTestWithHttpInfo($stress_test_request, $contentType);
     }
 
     /**
-     * Operation partnerControllerGetCurrentPartnerWithHttpInfo
+     * Operation stressTestControllerTestWithHttpInfo
      *
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['partnerControllerGetCurrentPartner'] to see the possible values for this operation
+     * @param  \OpenAPI\Client\Model\StressTestRequest $stress_test_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['stressTestControllerTest'] to see the possible values for this operation
      *
      * @throws \OpenAPI\Client\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
-     * @return array of \OpenAPI\Client\Model\PartnerDto, HTTP status code, HTTP response headers (array of strings)
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
-    public function partnerControllerGetCurrentPartnerWithHttpInfo(string $contentType = self::contentTypes['partnerControllerGetCurrentPartner'][0])
+    public function stressTestControllerTestWithHttpInfo($stress_test_request, string $contentType = self::contentTypes['stressTestControllerTest'][0])
     {
-        $request = $this->partnerControllerGetCurrentPartnerRequest($contentType);
+        $request = $this->stressTestControllerTestRequest($stress_test_request, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -176,45 +177,9 @@ class PartnersApi
             $statusCode = $response->getStatusCode();
 
 
-            switch($statusCode) {
-                case 200:
-                    return $this->handleResponseWithDataType(
-                        '\OpenAPI\Client\Model\PartnerDto',
-                        $request,
-                        $response,
-                    );
-            }
-
-            
-
-            if ($statusCode < 200 || $statusCode > 299) {
-                throw new ApiException(
-                    sprintf(
-                        '[%d] Error connecting to the API (%s)',
-                        $statusCode,
-                        (string) $request->getUri()
-                    ),
-                    $statusCode,
-                    $response->getHeaders(),
-                    (string) $response->getBody()
-                );
-            }
-
-            return $this->handleResponseWithDataType(
-                '\OpenAPI\Client\Model\PartnerDto',
-                $request,
-                $response,
-            );
+            return [null, $statusCode, $response->getHeaders()];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
-                case 200:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\OpenAPI\Client\Model\PartnerDto',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    throw $e;
             }
         
 
@@ -223,16 +188,17 @@ class PartnersApi
     }
 
     /**
-     * Operation partnerControllerGetCurrentPartnerAsync
+     * Operation stressTestControllerTestAsync
      *
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['partnerControllerGetCurrentPartner'] to see the possible values for this operation
+     * @param  \OpenAPI\Client\Model\StressTestRequest $stress_test_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['stressTestControllerTest'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function partnerControllerGetCurrentPartnerAsync(string $contentType = self::contentTypes['partnerControllerGetCurrentPartner'][0])
+    public function stressTestControllerTestAsync($stress_test_request, string $contentType = self::contentTypes['stressTestControllerTest'][0])
     {
-        return $this->partnerControllerGetCurrentPartnerAsyncWithHttpInfo($contentType)
+        return $this->stressTestControllerTestAsyncWithHttpInfo($stress_test_request, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -241,36 +207,24 @@ class PartnersApi
     }
 
     /**
-     * Operation partnerControllerGetCurrentPartnerAsyncWithHttpInfo
+     * Operation stressTestControllerTestAsyncWithHttpInfo
      *
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['partnerControllerGetCurrentPartner'] to see the possible values for this operation
+     * @param  \OpenAPI\Client\Model\StressTestRequest $stress_test_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['stressTestControllerTest'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function partnerControllerGetCurrentPartnerAsyncWithHttpInfo(string $contentType = self::contentTypes['partnerControllerGetCurrentPartner'][0])
+    public function stressTestControllerTestAsyncWithHttpInfo($stress_test_request, string $contentType = self::contentTypes['stressTestControllerTest'][0])
     {
-        $returnType = '\OpenAPI\Client\Model\PartnerDto';
-        $request = $this->partnerControllerGetCurrentPartnerRequest($contentType);
+        $returnType = '';
+        $request = $this->stressTestControllerTestRequest($stress_test_request, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
             ->then(
                 function ($response) use ($returnType) {
-                    if ($returnType === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ($returnType !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, $returnType, []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
+                    return [null, $response->getStatusCode(), $response->getHeaders()];
                 },
                 function ($exception) {
                     $response = $exception->getResponse();
@@ -290,18 +244,26 @@ class PartnersApi
     }
 
     /**
-     * Create request for operation 'partnerControllerGetCurrentPartner'
+     * Create request for operation 'stressTestControllerTest'
      *
-     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['partnerControllerGetCurrentPartner'] to see the possible values for this operation
+     * @param  \OpenAPI\Client\Model\StressTestRequest $stress_test_request (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['stressTestControllerTest'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function partnerControllerGetCurrentPartnerRequest(string $contentType = self::contentTypes['partnerControllerGetCurrentPartner'][0])
+    public function stressTestControllerTestRequest($stress_test_request, string $contentType = self::contentTypes['stressTestControllerTest'][0])
     {
 
+        // verify the required parameter 'stress_test_request' is set
+        if ($stress_test_request === null || (is_array($stress_test_request) && count($stress_test_request) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $stress_test_request when calling stressTestControllerTest'
+            );
+        }
 
-        $resourcePath = '/partners/me';
+
+        $resourcePath = '/stress-test';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
@@ -313,13 +275,20 @@ class PartnersApi
 
 
         $headers = $this->headerSelector->selectHeaders(
-            ['application/json', ],
+            [],
             $contentType,
             $multipart
         );
 
         // for model (json/xml)
-        if (count($formParams) > 0) {
+        if (isset($stress_test_request)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                $httpBody = \GuzzleHttp\Utils::jsonEncode(ObjectSerializer::sanitizeForSerialization($stress_test_request));
+            } else {
+                $httpBody = $stress_test_request;
+            }
+        } elseif (count($formParams) > 0) {
             if ($multipart) {
                 $multipartContents = [];
                 foreach ($formParams as $formParamName => $formParamValue) {
@@ -358,7 +327,7 @@ class PartnersApi
         $operationHost = $this->config->getHost();
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
-            'GET',
+            'POST',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody
