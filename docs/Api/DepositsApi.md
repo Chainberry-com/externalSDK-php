@@ -126,7 +126,7 @@ try {
 ## `depositControllerGetDepositPayment()`
 
 ```php
-depositControllerGetDepositPayment($payment_id): \OpenAPI\Client\Model\GetDepositPaymentDto[]
+depositControllerGetDepositPayment($payment_id): \OpenAPI\Client\Model\GetDepositPaymentDto
 ```
 
 
@@ -162,7 +162,7 @@ try {
 
 ### Return type
 
-[**\OpenAPI\Client\Model\GetDepositPaymentDto[]**](../Model/GetDepositPaymentDto.md)
+[**\OpenAPI\Client\Model\GetDepositPaymentDto**](../Model/GetDepositPaymentDto.md)
 
 ### Authorization
 

@@ -87,5 +87,3 @@ lib/Model/WithdrawDto.php
 lib/Model/WithdrawRequest.php
 lib/ObjectSerializer.php
 phpunit.xml.dist
-test/Api/StressTestApiTest.php
-test/Model/StressTestRequestTest.php

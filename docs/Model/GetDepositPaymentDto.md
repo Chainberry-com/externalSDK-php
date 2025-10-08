@@ -27,5 +27,6 @@ Name | Type | Description | Notes
 **conversion_rate** | **float** |  |
 **crypto_transaction_info** | [**\OpenAPI\Client\Model\GetDepositPaymentDtoCryptoTransactionInfoInner[]**](GetDepositPaymentDtoCryptoTransactionInfoInner.md) |  |
 **rate** | **float** |  |
+**partner_payment_id** | **string** |  | [optional]
 
 [[Back to Model list]](../../README.md#models) [[Back to API list]](../../README.md#endpoints) [[Back to README]](../../README.md)

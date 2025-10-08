@@ -11,9 +11,9 @@ Name | Type | Description | Notes
 **api_token** | **string** |  |
 **timestamp** | **float** |  |
 **signature** | **string** |  |
-**partner_payment_id** | **string** |  |
+**partner_payment_id** | **string** |  | [optional]
 **trading_account_login** | **string** |  |
-**withdraw_currency** | **string** |  |
+**withdraw_currency** | **string** | Withdraw Currency. It should be one of the following BTC, ETH, USDT, USDC, BNB, LTC, TON |
 **address** | **string** |  |
 **tag** | **string** |  | [optional]
 

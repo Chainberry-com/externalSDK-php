@@ -14,6 +14,7 @@ Name | Type | Description | Notes
 **final_currency** | **string** |  |
 **conversion_rate** | **float** |  |
 **crypto_transaction_info** | [**\OpenAPI\Client\Model\GetDepositDtoCryptoTransactionInfoInner[]**](GetDepositDtoCryptoTransactionInfoInner.md) |  |
+**partner_payment_id** | **string** |  | [optional]
 **address** | **string** |  |
 **tag** | **string** |  |
 
