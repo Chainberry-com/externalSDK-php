@@ -98,6 +98,15 @@ class DepositService
             'tradingAccountLogin' => $params['tradingAccountLogin'],
         ];
 
+        $excludeKeys = ['signature', 'paymentGatewayName'];
+
+        $additionalParams = array_diff_key(
+            $params,
+            $payloadToSign,
+            array_flip($excludeKeys)
+        );
+        $payloadToSign = array_merge($payloadToSign, $additionalParams);
+
         if ($paymentGatewayName) {
             $payloadToSign['paymentGatewayName'] = $paymentGatewayName;
         }
