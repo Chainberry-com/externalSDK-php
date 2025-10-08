@@ -22,6 +22,7 @@ class Environment
 {
     public const STAGING = 'staging';
     public const PRODUCTION = 'production';
+    public const LOCAL = 'local';
 }
 
 /**
@@ -67,6 +68,7 @@ class ApiSetup
     private const DEFAULT_BASE_URLS = [
         Environment::STAGING => 'https://api-stg.chainberry.com/api/v1',
         Environment::PRODUCTION => 'https://api.chainberry.com/api/v1',
+        Environment::LOCAL => 'http://192.168.0.20:3001/api/v1',
     ];
 
     private const CHAINBERRY_PUBLIC_KEYS = [
@@ -87,6 +89,15 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoxUR0G/8yIIkLWAivkgd
 V2sj6YxNpGQ+uaY3aO6yTGRU0ZBTrHfxJlsRSeiaTXxX9QhRUPjQRAk5OuLrF5kO
 keEKz/U+LCYEW27a3AfFzs0d1D/zIxCEBCft/EwhMHqM+fnSSk/DdxFt63m789IO
 BwIDAQAB
+-----END PUBLIC KEY-----",
+        Environment::LOCAL => "-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwvCN/n7etTqjNJ0M0JmU
+cGPaXoc6ttN8f3KT02ZV8CpGOV3ekUIwgvXw6mCq4jz2mmGkfnjneuWbWMru3w4I
+6xngWdMeJqcVoOviTPn9wuASnsAu4imMxOxRoyLNDqstOg1g0N4wISaCazmCwJXW
+LwavgC++lnO/iVXHVln5+DDCSSICkII6RGeYoXMev/SvvV1FoQ7tnC6Z069Uh+Uy
+5NYHZrQ/lVIoq9fi0WLrhMzDWYR5ncDjeKntmMb2B2h7Prs3/RXx7bvV1BzSBkE9
+nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
+0QIDAQAB
 -----END PUBLIC KEY-----",
     ];
 
@@ -275,6 +286,9 @@ BwIDAQAB
         }
         if (in_array($normalized, ['production', 'prod'])) {
             return Environment::PRODUCTION;
+        }
+        if (in_array($normalized, ['local'])) {
+            return Environment::LOCAL;
         }
         return null;
     }
