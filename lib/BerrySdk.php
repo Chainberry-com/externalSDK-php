@@ -98,11 +98,11 @@ class BerrySdk
      * 
      * @param string $paymentId Payment ID
      * @param int $maxRetries Maximum retry attempts
-     * @return \OpenAPI\Client\Model\GetDepositDto Deposit information
+     * @return \OpenAPI\Client\Model\GetDepositPaymentDto Deposit information
      * @throws BadRequestError
      * @throws UnauthorizedError
      */
-    public static function getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\GetDepositDto
+    public static function getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\GetDepositPaymentDto
     {
         $depositService = new DepositService();
         return $depositService->getDeposit($paymentId, $maxRetries);

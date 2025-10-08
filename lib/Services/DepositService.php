@@ -138,12 +138,12 @@ class DepositService
      * 
      * @param string $paymentId Payment ID
      * @param int $maxRetries Maximum retry attempts
-     * @return \OpenAPI\Client\Model\GetDepositDto Deposit information
+     * @return \OpenAPI\Client\Model\GetDepositPaymentDto Deposit information
      * @throws BadRequestError
      * @throws UnauthorizedError
      * @throws \Exception
      */
-    public function getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\GetDepositDto
+    public function getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\GetDepositPaymentDto
     {
         $lastError = null;
 
@@ -153,10 +153,10 @@ class DepositService
                 if ($attempt === 0) {
                     try {
                         // Make the API call with whatever token is currently set (if any)
-                        $response = $this->apiSetup->getDepositsApi()->depositControllerGetDeposit($paymentId);
+                        $response = $this->apiSetup->getDepositsApi()->depositControllerGetDepositPayment($paymentId);
 
                         if (!empty($response)) {
-                            return $response;
+                            return is_array($response) ? $response[0] : $response;
                         } else {
                             throw new \Exception("No data received from API");
                         }
@@ -178,10 +178,10 @@ class DepositService
                 $this->apiSetup->ensureAccessToken();
 
                 // Make the API call
-                $response = $this->apiSetup->getDepositsApi()->depositControllerGetDeposit($paymentId);
+                $response = $this->apiSetup->getDepositsApi()->depositControllerGetDepositPayment($paymentId);
 
                 if (!empty($response)) {
-                    return $response;
+                    return is_array($response) ? $response[0] : $response;
                 } else {
                     throw new \Exception("No data received from API");
                 }
@@ -214,10 +214,10 @@ class DepositService
      * 
      * @param string $paymentId The payment ID to retrieve
      * @param int $maxRetries Maximum number of retries (defaults to 2)
-     * @return \OpenAPI\Client\Model\GetDepositDto Deposit information
+     * @return \OpenAPI\Client\Model\GetDepositPaymentDto Deposit information
      * @throws \Exception
      */
-    public function getDepositWithEnvAuth(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\GetDepositDto
+    public function getDepositWithEnvAuth(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\GetDepositPaymentDto
     {
         // Check for required environment variables
         $clientId = getenv('CB_API_CLIENT_ID');

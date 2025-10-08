@@ -98,6 +98,15 @@ class WithdrawService
             'address' => $params['address'],
         ];
 
+        $excludeKeys = ['signature'];
+
+        $additionalParams = array_diff_key(
+            $params,
+            $payloadToSign,
+            array_flip($excludeKeys)
+        );
+        $payloadToSign = array_merge($payloadToSign, $additionalParams);
+
         $privateKey = $this->apiSetup->getConfig()->privateKey;
         if (empty($privateKey)) {
             throw new \Exception("Private key is required but not found in config");
