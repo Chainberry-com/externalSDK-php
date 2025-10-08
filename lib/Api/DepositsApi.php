@@ -716,7 +716,7 @@ class DepositsApi
             switch($statusCode) {
                 case 200:
                     return $this->handleResponseWithDataType(
-                        '\OpenAPI\Client\Model\GetDepositPaymentDto[]',
+                        '\OpenAPI\Client\Model\GetDepositPaymentDto',
                         $request,
                         $response,
                     );
