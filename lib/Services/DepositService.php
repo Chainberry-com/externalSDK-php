@@ -5,9 +5,10 @@ namespace OpenAPI\Client\Services;
 use OpenAPI\Client\ApiSetup;
 use OpenAPI\Client\Errors\BadRequestError;
 use OpenAPI\Client\Errors\UnauthorizedError;
+use OpenAPI\Client\Model\DepositRequestV2Dto;
+use OpenAPI\Client\Model\DepositResponseV2Dto;
+use OpenAPI\Client\Model\PaymentResponseV2Dto;
 use OpenAPI\Client\Utils\CryptoUtils;
-use OpenAPI\Client\Utils\Retry;
-use OpenAPI\Client\Utils\RetryOptions;
 use OpenAPI\Client\Utils\Validators;
 
 /**
@@ -17,10 +18,17 @@ class CreateDepositParams
 {
     public string $amount;
     public string $currency;
-    public ?string $paymentGatewayName = null;
-    public ?string $paymentCurrency = null;
     public string $callbackUrl;
-    public string $tradingAccountLogin;
+    public string $partnerUserId;
+    public ?string $network = null;
+    public ?string $partnerPaymentId = null;
+
+    /** @deprecated Use $partnerUserId instead */
+    public ?string $tradingAccountLogin = null;
+    /** @deprecated Use $network instead */
+    public ?string $paymentGatewayName = null;
+    /** @deprecated Field no longer used in V2 */
+    public ?string $paymentCurrency = null;
 }
 
 /**
@@ -37,14 +45,13 @@ class DepositService
 
     /**
      * Creates a deposit request with a generated signature
-     * 
+     *
      * @param array $params The deposit parameters
-     * @return array A signed deposit request object
+     * @return DepositRequestV2Dto
      * @throws \Exception
      */
-    public function getSignedDepositRequest(array $params): array
+    public function getSignedDepositRequest(array $params): DepositRequestV2Dto
     {
-        // Validate input parameters
         $this->validateCreateDepositParams($params);
 
         $apiToken = $this->apiSetup->getConfig()->clientId;
@@ -52,63 +59,12 @@ class DepositService
             throw new \Exception("Api token is required but not found in config");
         }
 
+        $currency = strtoupper($params['currency']);
         $supportedAssets = $this->apiSetup->getAssetApi()->assetControllerGetSupportedAssets();
-        $supportedAssetCurrency = $this->findAssetBySymbol($supportedAssets, $params['currency']);
-        
-        if (empty($supportedAssetCurrency)) {
+        if ($this->findAssetBySymbol($supportedAssets, $currency) === null) {
             throw new \Exception(
-                "Currency {$params['currency']} is not supported. It should be one of the following BTC, ETH, USDT, USDC, BNB, LTC, TON"
+                "Currency {$currency} is not supported. It should be one of the supported assets returned by the Asset API."
             );
-        }
-
-        $paymentCurrency = $params['paymentCurrency'] ?? $supportedAssetCurrency['symbol'];
-        
-        if (!empty($params['paymentCurrency'])) {
-            $supportedAssetPaymentCurrency = $this->findAssetBySymbol($supportedAssets, $params['paymentCurrency']);
-            if (empty($supportedAssetPaymentCurrency)) {
-                throw new \Exception(
-                    "Payment Currency {$params['paymentCurrency']} is not supported. It should be one of the following BTC, ETH, USDT, USDC, BNB, LTC, TON"
-                );
-            }
-        }
-
-        $paymentGatewayName = $params['paymentGatewayName'] ?? null;
-        // if (empty($paymentGatewayName)) {
-        //     if ($this->isToken($paymentCurrency)) {
-        //         throw new \Exception("Payment gateway name is required!");
-        //     }
-        //     if ($paymentCurrency === $params['currency']) {
-        //         $paymentGatewayName = $supportedAssetCurrency['symbol'];
-        //     } else {
-        //         throw new \Exception(
-        //             "Payment currency {$paymentCurrency} is not supported. Please specify a different payment currency or payment gateway."
-        //         );
-        //     }
-        // }
-
-        // Create the payload to sign (excluding signature field)
-        $payloadToSign = [
-            'amount' => $params['amount'],
-            'currency' => $params['currency'],
-            // 'paymentGatewayName' => $paymentGatewayName,
-            'paymentCurrency' => $paymentCurrency,
-            'callbackUrl' => $params['callbackUrl'],
-            'apiToken' => $apiToken,
-            'timestamp' => time(),
-            'tradingAccountLogin' => $params['tradingAccountLogin'],
-        ];
-
-        $excludeKeys = ['signature', 'paymentGatewayName'];
-
-        $additionalParams = array_diff_key(
-            $params,
-            $payloadToSign,
-            array_flip($excludeKeys)
-        );
-        $payloadToSign = array_merge($payloadToSign, $additionalParams);
-
-        if ($paymentGatewayName) {
-            $payloadToSign['paymentGatewayName'] = $paymentGatewayName;
         }
 
         $privateKey = $this->apiSetup->getConfig()->privateKey;
@@ -116,119 +72,90 @@ class DepositService
             throw new \Exception("Private key is required but not found in config");
         }
 
-        // Generate signature using the utils function
-        return CryptoUtils::signPayload($payloadToSign, $privateKey);
+        $partnerUserId = $this->resolvePartnerUserId($params);
+        $network = $this->resolveNetwork($params);
+        $partnerPaymentId = $this->resolvePartnerPaymentId($params);
+
+        $payloadToSign = [
+            'amount' => (string) $params['amount'],
+            'currency' => $currency,
+            'callbackUrl' => $params['callbackUrl'],
+            'apiToken' => $apiToken,
+            'timestamp' => time(),
+            'partnerUserID' => $partnerUserId,
+        ];
+
+        if ($network !== null) {
+            $payloadToSign['network'] = $network;
+        }
+
+        if ($partnerPaymentId !== null) {
+            $payloadToSign['partnerPaymentID'] = $partnerPaymentId;
+        }
+
+        $signedPayload = CryptoUtils::signPayload($payloadToSign, $privateKey);
+
+        return $this->mapToDepositRequestDto($signedPayload);
     }
 
     /**
      * Creates and submits a deposit request
-     * 
+     *
      * @param array $params The deposit parameters
-     * @return \OpenAPI\Client\Model\DepositDto Deposit response
+     * @return DepositResponseV2Dto
      * @throws BadRequestError
      * @throws UnauthorizedError
      * @throws \Exception
      */
-    public function createDeposit(array $params): \OpenAPI\Client\Model\DepositDto
+    public function createDeposit(array $params): DepositResponseV2Dto
     {
-        $signedRequest = $this->getSignedDepositRequest($params);
-        
+        $requestDto = $this->getSignedDepositRequest($params);
+
         try {
-            $response = $this->apiSetup->getDepositsApi()->depositControllerCreateDeposit($signedRequest);
-            return $response;
+            return $this->apiSetup
+                ->getDepositsApi()
+                ->depositV2ControllerCreateDepositV2($requestDto);
         } catch (\Exception $error) {
-            // Re-throw the original error - let the caller handle specific error types
             throw $error;
         }
     }
 
     /**
-     * Gets deposit information with automatic JWT token authentication and retry logic
-     * 
+     * Gets deposit information
+     *
      * @param string $paymentId Payment ID
-     * @param int $maxRetries Maximum retry attempts
-     * @return \OpenAPI\Client\Model\GetDepositPaymentDto Deposit information
+     * @return PaymentResponseV2Dto Deposit information
      * @throws BadRequestError
      * @throws UnauthorizedError
      * @throws \Exception
      */
-    public function getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\GetDepositPaymentDto
+    public function getDeposit(string $paymentId, int $maxRetries = 2): PaymentResponseV2Dto
     {
-        $lastError = null;
-
-        for ($attempt = 0; $attempt <= $maxRetries; $attempt++) {
-            try {
-                // On first attempt, try without getting a new token (use existing if available)
-                if ($attempt === 0) {
-                    try {
-                        // Make the API call with whatever token is currently set (if any)
-                        $response = $this->apiSetup->getDepositsApi()->depositControllerGetDepositPayment($paymentId);
-
-                        if (!empty($response)) {
-                            return is_array($response) ? $response[0] : $response;
-                        } else {
-                            throw new \Exception("No data received from API");
-                        }
-                    } catch (\Exception $error) {
-                        // Check if it's an authentication error (401)
-                        $isAuthError = $this->isAuthenticationError($error);
-
-                        // If it's not an auth error, throw immediately
-                        if (!$isAuthError) {
-                            throw $error;
-                        }
-
-                        // If it's an auth error, continue to the next attempt to get a fresh token
-                        $lastError = $error;
-                    }
-                }
-
-                // For retry attempts or if first attempt failed with auth error, get a fresh token
+        try {
+            return $this->apiSetup
+                ->getDepositsApi()
+                ->depositV2ControllerGetDepositPaymentV2($paymentId);
+        } catch (\Exception $error) {
+            if ($this->isAuthenticationError($error)) {
                 $this->apiSetup->ensureAccessToken();
-
-                // Make the API call
-                $response = $this->apiSetup->getDepositsApi()->depositControllerGetDepositPayment($paymentId);
-
-                if (!empty($response)) {
-                    return is_array($response) ? $response[0] : $response;
-                } else {
-                    throw new \Exception("No data received from API");
-                }
-            } catch (\Exception $error) {
-                $lastError = $error;
-
-                // Check if it's an authentication error (401)
-                $isAuthError = $this->isAuthenticationError($error);
-
-                // If it's not an auth error or we've exhausted retries, throw the error
-                if (!$isAuthError || $attempt === $maxRetries) {
-                    throw $error;
-                }
-
-                // For auth errors, wait a bit before retrying (exponential backoff)
-                if ($attempt < $maxRetries) {
-                    $delay = pow(2, $attempt) * 1000; // 1s, 2s, 4s...
-                    usleep($delay * 1000); // Convert to microseconds
-                    error_log("Authentication failed, retrying in {$delay}ms... (attempt " . ($attempt + 1) . "/" . ($maxRetries + 1) . ")");
-                }
+                return $this->apiSetup
+                    ->getDepositsApi()
+                    ->depositV2ControllerGetDepositPaymentV2($paymentId);
             }
-        }
 
-        // This should never be reached, but just in case
-        throw $lastError ?? new \Exception("Failed to get deposit information after all retries");
+            throw $error;
+        }
     }
 
     /**
      * Gets deposit information with automatic JWT token authentication using environment variables
-     * 
+     *
      * @param string $paymentId The payment ID to retrieve
-     * @param int $maxRetries Maximum number of retries (defaults to 2)
-     * @return \OpenAPI\Client\Model\GetDepositPaymentDto Deposit information
+     * @return PaymentResponseV2Dto Deposit information
      * @throws \Exception
      */
-    public function getDepositWithEnvAuth(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\GetDepositPaymentDto
+    public function getDepositWithEnvAuth(string $paymentId, int $maxRetries = 2): PaymentResponseV2Dto
     {
-        // Check for required environment variables
         $clientId = getenv('CB_API_CLIENT_ID');
         $clientSecret = getenv('CB_API_CLIENT_SECRET');
 
@@ -241,16 +168,72 @@ class DepositService
 
     /**
      * Validate create deposit parameters
-     * 
+     *
      * @param array $params Parameters to validate
-     * @throws \Exception
      */
     private function validateCreateDepositParams(array $params): void
     {
         Validators::amount()->validateAndThrow($params['amount'] ?? null, 'Amount');
-        // Validators::currency()->validateAndThrow($params['currency'] ?? null, 'Currency');
+
+        $currency = $params['currency'] ?? null;
+        Validators::currency()->validateAndThrow($currency !== null ? strtoupper($currency) : null, 'Currency');
+
         Validators::callbackUrl()->validateAndThrow($params['callbackUrl'] ?? null, 'Callback URL');
-        Validators::tradingAccountLogin()->validateAndThrow($params['tradingAccountLogin'] ?? null, 'Trading Account Login');
+
+        $partnerUserId = $this->resolvePartnerUserId($params);
+        Validators::partnerUserId()->validateAndThrow($partnerUserId, 'Partner User ID');
+
+        $network = $params['network'] ?? $params['paymentGatewayName'] ?? null;
+        if ($network !== null && $network !== '') {
+            Validators::optionalNetwork('Network')->validateAndThrow(strtoupper($network), 'Network');
+        }
+    }
+
+    private function resolvePartnerUserId(array $params): string
+    {
+        return (string) ($params['partnerUserID']
+            ?? $params['partnerUserId']
+            ?? $params['tradingAccountLogin']
+            ?? '');
+    }
+
+    private function resolveNetwork(array $params): ?string
+    {
+        $network = $params['network'] ?? $params['paymentGatewayName'] ?? null;
+        return $network !== null && $network !== ''
+            ? strtoupper((string) $network)
+            : null;
+    }
+
+    private function resolvePartnerPaymentId(array $params): ?string
+    {
+        $partnerPaymentId = $params['partnerPaymentID'] ?? $params['partnerPaymentId'] ?? null;
+        return $partnerPaymentId !== null && $partnerPaymentId !== ''
+            ? (string) $partnerPaymentId
+            : null;
+    }
+
+    private function mapToDepositRequestDto(array $signedPayload): DepositRequestV2Dto
+    {
+        $data = [
+            'callback_url' => $signedPayload['callbackUrl'],
+            'api_token' => $signedPayload['apiToken'],
+            'timestamp' => (float) $signedPayload['timestamp'],
+            'signature' => $signedPayload['signature'],
+            'partner_user_id' => $signedPayload['partnerUserID'],
+            'amount' => (string) $signedPayload['amount'],
+            'currency' => $signedPayload['currency'],
+        ];
+
+        if (array_key_exists('partnerPaymentID', $signedPayload)) {
+            $data['partner_payment_id'] = $signedPayload['partnerPaymentID'];
+        }
+
+        if (array_key_exists('network', $signedPayload)) {
+            $data['network'] = $signedPayload['network'];
+        }
+
+        return new DepositRequestV2Dto($data);
     }
 
     /**
@@ -262,30 +245,30 @@ class DepositService
      */
     private function findAssetBySymbol(array $supportedAssets, string $symbol): ?array
     {
+        $needle = strtoupper($symbol);
+
         foreach ($supportedAssets as $asset) {
-            if ($asset['symbol'] === $symbol) {
-                // Convert SupportedAssetDto to array if it's an object
+            $assetSymbol = null;
+
+            if (is_object($asset) && method_exists($asset, 'getSymbol')) {
+                $assetSymbol = strtoupper($asset->getSymbol());
+            } elseif (is_array($asset) && isset($asset['symbol'])) {
+                $assetSymbol = strtoupper($asset['symbol']);
+            }
+
+            if ($assetSymbol === $needle) {
                 if (is_object($asset)) {
                     return [
                         'symbol' => $asset->getSymbol(),
-                        'name' => $asset->getName()
+                        'name' => method_exists($asset, 'getName') ? $asset->getName() : null,
                     ];
                 }
+
                 return $asset;
             }
         }
-        return null;
-    }
 
-    /**
-     * Check if value is a token
-     * 
-     * @param string $value Value to check
-     * @return bool True if token
-     */
-    private function isToken(string $value): bool
-    {
-        return strtolower($value) === 'usdt' || strtolower($value) === 'usdc';
+        return null;
     }
 
     /**

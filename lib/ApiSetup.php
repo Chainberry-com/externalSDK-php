@@ -3,7 +3,7 @@
 namespace OpenAPI\Client;
 
 use OpenAPI\Client\Api\AssetApi;
-use OpenAPI\Client\Api\AutoConversionApi;
+use OpenAPI\Client\Api\ConvertApi;
 use OpenAPI\Client\Api\DepositsApi;
 use OpenAPI\Client\Api\OauthApi;
 use OpenAPI\Client\Api\TestApi;
@@ -58,7 +58,7 @@ class ApiSetup
     private ?ExternalApiConfig $config = null;
     private ?Configuration $configuration = null;
     private ?AssetApi $assetApi = null;
-    private ?AutoConversionApi $autoConversionApi = null;
+    private ?ConvertApi $autoConversionApi = null;
     private ?DepositsApi $depositsApi = null;
     private ?OauthApi $oauthApi = null;
     private ?TestApi $testApi = null;
@@ -68,7 +68,7 @@ class ApiSetup
     private const DEFAULT_BASE_URLS = [
         Environment::STAGING => 'https://api-stg.chainberry.com/api/v1',
         Environment::PRODUCTION => 'https://api.chainberry.com/api/v1',
-        Environment::LOCAL => 'http://192.168.0.20:3001/api/v1',
+        Environment::LOCAL => 'http://192.168.0.226:3001/api/v1',
     ];
 
     private const CHAINBERRY_PUBLIC_KEYS = [
@@ -134,7 +134,7 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
 
         // Initialize API instances
         $this->assetApi = new AssetApi(null, $this->configuration);
-        $this->autoConversionApi = new AutoConversionApi(null, $this->configuration);
+        $this->autoConversionApi = new ConvertApi(null, $this->configuration);
         $this->depositsApi = new DepositsApi(null, $this->configuration);
         $this->oauthApi = new OauthApi(null, $this->configuration);
         $this->testApi = new TestApi(null, $this->configuration);
@@ -378,9 +378,9 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
     /**
      * Get Auto Conversion API instance
      * 
-     * @return AutoConversionApi
+     * @return ConvertApi
      */
-    public function getAutoConversionApi(): AutoConversionApi
+    public function getAutoConversionApi(): ConvertApi
     {
         return $this->autoConversionApi;
     }

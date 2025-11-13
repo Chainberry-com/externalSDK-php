@@ -4,6 +4,8 @@ namespace OpenAPI\Client\Utils;
 
 class Validators
 {
+    private const SUPPORTED_NETWORKS = ['ETH', 'BNB', 'POL', 'TRX', 'TON'];
+
     public static function email(): Validator
     {
         return (new Validator())
@@ -29,7 +31,7 @@ class Validators
     {
         return (new Validator())
             ->addRule(ValidationRules::required("Currency is required"))
-            ->addRule(ValidationRules::pattern('/^[A-Z]{3}$/', "Currency must be a 3-letter code"));
+            ->addRule(ValidationRules::pattern('/^[A-Z]{3,5}$/', "Currency must be a 3 to 5 letter uppercase code"));
     }
 
     public static function callbackUrl(): Validator
@@ -44,5 +46,55 @@ class Validators
         return (new Validator())
             ->addRule(ValidationRules::required("Trading account login is required"))
             ->addRule(ValidationRules::minLength(1, "Trading account login cannot be empty"));
+    }
+
+    public static function partnerUserId(): Validator
+    {
+        return (new Validator())
+            ->addRule(ValidationRules::required("Partner user ID is required"))
+            ->addRule(ValidationRules::minLength(1, "Partner user ID cannot be empty"));
+    }
+
+    public static function network(?string $fieldLabel = 'Network'): Validator
+    {
+        return (new Validator())
+            ->addRule(ValidationRules::required("{$fieldLabel} is required"))
+            ->addRule(ValidationRules::oneOf(self::SUPPORTED_NETWORKS, "{$fieldLabel} must be one of: " . implode(', ', self::SUPPORTED_NETWORKS)));
+    }
+
+    public static function optionalNetwork(?string $fieldLabel = 'Network'): Validator
+    {
+        return (new Validator())
+            ->addRule(new class(self::SUPPORTED_NETWORKS, $fieldLabel) implements ValidationRule {
+                private array $allowed;
+                private string $label;
+
+                public function __construct(array $allowed, string $label)
+                {
+                    $this->allowed = $allowed;
+                    $this->label = $label;
+                }
+
+                public function validate($value): bool
+                {
+                    if ($value === null || $value === '') {
+                        return true;
+                    }
+
+                    return in_array($value, $this->allowed, true);
+                }
+
+                public function getMessage(): string
+                {
+                    return "{$this->label} must be one of: " . implode(', ', $this->allowed);
+                }
+            });
+    }
+
+    public static function address(): Validator
+    {
+        return (new Validator())
+            ->addRule(ValidationRules::required("Address is required"))
+            ->addRule(ValidationRules::minLength(1, "Address cannot be empty"));
     }
 }

@@ -69,11 +69,11 @@ class BerrySdk
      * Create a deposit
      * 
      * @param array $params Deposit parameters
-     * @return \OpenAPI\Client\Model\DepositDto Deposit response
+     * @return \OpenAPI\Client\Model\DepositResponseV2Dto Deposit response
      * @throws BadRequestError
      * @throws UnauthorizedError
      */
-    public static function createDeposit(array $params): \OpenAPI\Client\Model\DepositDto
+    public static function createDeposit(array $params): \OpenAPI\Client\Model\DepositResponseV2Dto
     {
         $depositService = new DepositService();
         return $depositService->createDeposit($params);
@@ -83,11 +83,11 @@ class BerrySdk
      * Create an auto conversion
      * 
      * @param array $params Auto conversion parameters
-     * @return \OpenAPI\Client\Model\AutoConversionResponseDto Auto conversion response
+     * @return \OpenAPI\Client\Model\AutoConversionResponseV2Dto Auto conversion response
      * @throws BadRequestError
      * @throws UnauthorizedError
      */
-    public static function createAutoConversion(array $params): \OpenAPI\Client\Model\AutoConversionResponseDto
+    public static function createAutoConversion(array $params): \OpenAPI\Client\Model\AutoConversionResponseV2Dto
     {
         $autoConversionService = new AutoConversionService();
         return $autoConversionService->createAutoConversion($params);
@@ -98,11 +98,11 @@ class BerrySdk
      * 
      * @param string $paymentId Payment ID
      * @param int $maxRetries Maximum retry attempts
-     * @return \OpenAPI\Client\Model\GetDepositPaymentDto Deposit information
+     * @return \OpenAPI\Client\Model\PaymentResponseV2Dto Deposit information
      * @throws BadRequestError
      * @throws UnauthorizedError
      */
-    public static function getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\GetDepositPaymentDto
+    public static function getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\PaymentResponseV2Dto
     {
         $depositService = new DepositService();
         return $depositService->getDeposit($paymentId, $maxRetries);
@@ -112,11 +112,11 @@ class BerrySdk
      * Create a withdrawal
      * 
      * @param array $params Withdrawal parameters
-     * @return \OpenAPI\Client\Model\WithdrawDto Withdrawal response
+     * @return \OpenAPI\Client\Model\WithdrawResponseV2Dto Withdrawal response
      * @throws BadRequestError
      * @throws UnauthorizedError
      */
-    public static function createWithdraw(array $params): \OpenAPI\Client\Model\WithdrawDto
+    public static function createWithdraw(array $params): \OpenAPI\Client\Model\WithdrawResponseV2Dto
     {
         $withdrawService = new WithdrawService();
         return $withdrawService->createWithdraw($params);
@@ -127,11 +127,11 @@ class BerrySdk
      * 
      * @param string $paymentId Payment ID
      * @param int $maxRetries Maximum retry attempts
-     * @return \OpenAPI\Client\Model\GetWithdrawDto Withdrawal information
+     * @return \OpenAPI\Client\Model\WithdrawV2Dto Withdrawal information
      * @throws BadRequestError
      * @throws UnauthorizedError
      */
-    public static function getWithdraw(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\GetWithdrawDto
+    public static function getWithdraw(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\WithdrawV2Dto
     {
         $withdrawService = new WithdrawService();
         return $withdrawService->getWithdraw($paymentId, $maxRetries);
