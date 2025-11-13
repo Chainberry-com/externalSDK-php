@@ -1,16 +1,18 @@
 # OpenAPI\Client\PublicKeyApi
 
-All URIs are relative to http://localhost:3001/api/v1, except if the operation defines another base path.
+
+
+All URIs are relative to http://localhost:3001/api/v2, except if the operation defines another base path.
 
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
-| [**publicKeyControllerDownloadPublicKey()**](PublicKeyApi.md#publicKeyControllerDownloadPublicKey) | **GET** /public-key |  |
+| [**publicKeyV2ControllerDownloadPublicKeyV2()**](PublicKeyApi.md#publicKeyV2ControllerDownloadPublicKeyV2) | **GET** /public-key |  |
 
 
-## `publicKeyControllerDownloadPublicKey()`
+## `publicKeyV2ControllerDownloadPublicKeyV2()`
 
 ```php
-publicKeyControllerDownloadPublicKey()
+publicKeyV2ControllerDownloadPublicKeyV2()
 ```
 
 
@@ -30,9 +32,9 @@ $apiInstance = new OpenAPI\Client\Api\PublicKeyApi(
 );
 
 try {
-    $apiInstance->publicKeyControllerDownloadPublicKey();
+    $apiInstance->publicKeyV2ControllerDownloadPublicKeyV2();
 } catch (Exception $e) {
-    echo 'Exception when calling PublicKeyApi->publicKeyControllerDownloadPublicKey: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling PublicKeyApi->publicKeyV2ControllerDownloadPublicKeyV2: ', $e->getMessage(), PHP_EOL;
 }
 ```
 

@@ -1,17 +1,19 @@
 # OpenAPI\Client\KytApi
 
-All URIs are relative to http://localhost:3001/api/v1, except if the operation defines another base path.
+
+
+All URIs are relative to http://localhost:3001/api/v2, except if the operation defines another base path.
 
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
-| [**kytControllerFetchKytStatuses()**](KytApi.md#kytControllerFetchKytStatuses) | **POST** /kyt/fetch-kyt-statuses |  |
-| [**kytControllerHandleMonitorNotification()**](KytApi.md#kytControllerHandleMonitorNotification) | **POST** /kyt | Process KYT monitor notification |
+| [**kytV2ControllerFetchKytStatusesV2()**](KytApi.md#kytV2ControllerFetchKytStatusesV2) | **POST** /kyt/fetch-kyt-statuses |  |
+| [**kytV2ControllerHandleMonitorNotificationV2()**](KytApi.md#kytV2ControllerHandleMonitorNotificationV2) | **POST** /kyt | Process KYT monitor notification |
 
 
-## `kytControllerFetchKytStatuses()`
+## `kytV2ControllerFetchKytStatusesV2()`
 
 ```php
-kytControllerFetchKytStatuses($x_auth_apikey, $kyt_fetch_status_dto)
+kytV2ControllerFetchKytStatusesV2($x_auth_apikey, $kyt_fetch_status_dto)
 ```
 
 
@@ -33,9 +35,9 @@ $x_auth_apikey = 'x_auth_apikey_example'; // string | API key for KYT service au
 $kyt_fetch_status_dto = new \OpenAPI\Client\Model\KytFetchStatusDto(); // \OpenAPI\Client\Model\KytFetchStatusDto
 
 try {
-    $apiInstance->kytControllerFetchKytStatuses($x_auth_apikey, $kyt_fetch_status_dto);
+    $apiInstance->kytV2ControllerFetchKytStatusesV2($x_auth_apikey, $kyt_fetch_status_dto);
 } catch (Exception $e) {
-    echo 'Exception when calling KytApi->kytControllerFetchKytStatuses: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling KytApi->kytV2ControllerFetchKytStatusesV2: ', $e->getMessage(), PHP_EOL;
 }
 ```
 
@@ -63,10 +65,10 @@ No authorization required
 [[Back to Model list]](../../README.md#models)
 [[Back to README]](../../README.md)
 
-## `kytControllerHandleMonitorNotification()`
+## `kytV2ControllerHandleMonitorNotificationV2()`
 
 ```php
-kytControllerHandleMonitorNotification($x_auth_apikey, $kyt_monitor_notification_dto)
+kytV2ControllerHandleMonitorNotificationV2($x_auth_apikey, $kyt_monitor_notification_dto)
 ```
 
 Process KYT monitor notification
@@ -90,9 +92,9 @@ $x_auth_apikey = 'x_auth_apikey_example'; // string | API key for KYT service au
 $kyt_monitor_notification_dto = new \OpenAPI\Client\Model\KytMonitorNotificationDto(); // \OpenAPI\Client\Model\KytMonitorNotificationDto
 
 try {
-    $apiInstance->kytControllerHandleMonitorNotification($x_auth_apikey, $kyt_monitor_notification_dto);
+    $apiInstance->kytV2ControllerHandleMonitorNotificationV2($x_auth_apikey, $kyt_monitor_notification_dto);
 } catch (Exception $e) {
-    echo 'Exception when calling KytApi->kytControllerHandleMonitorNotification: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling KytApi->kytV2ControllerHandleMonitorNotificationV2: ', $e->getMessage(), PHP_EOL;
 }
 ```
 

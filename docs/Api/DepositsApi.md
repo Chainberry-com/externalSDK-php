@@ -1,20 +1,20 @@
 # OpenAPI\Client\DepositsApi
 
-All URIs are relative to http://localhost:3001/api/v1, except if the operation defines another base path.
+
+
+All URIs are relative to http://localhost:3001/api/v2, except if the operation defines another base path.
 
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
-| [**depositControllerCreateDeposit()**](DepositsApi.md#depositControllerCreateDeposit) | **POST** /deposits |  |
-| [**depositControllerGetDeposit()**](DepositsApi.md#depositControllerGetDeposit) | **GET** /deposits/{paymentId} |  |
-| [**depositControllerGetDepositPayment()**](DepositsApi.md#depositControllerGetDepositPayment) | **GET** /deposits/payments/{paymentId} |  |
-| [**depositControllerSetupSupportingAssets()**](DepositsApi.md#depositControllerSetupSupportingAssets) | **GET** /deposits/setup-supporting-assets |  |
-| [**depositControllerSyncUpWithFireblocks()**](DepositsApi.md#depositControllerSyncUpWithFireblocks) | **GET** /deposits/sync-up-with-fireblocks |  |
+| [**depositV2ControllerCreateDepositV2()**](DepositsApi.md#depositV2ControllerCreateDepositV2) | **POST** /deposits |  |
+| [**depositV2ControllerGetDepositPaymentV2()**](DepositsApi.md#depositV2ControllerGetDepositPaymentV2) | **GET** /deposits/payments/{paymentId} |  |
+| [**depositV2ControllerGetDepositV2()**](DepositsApi.md#depositV2ControllerGetDepositV2) | **GET** /deposits/{paymentId} |  |
 
 
-## `depositControllerCreateDeposit()`
+## `depositV2ControllerCreateDepositV2()`
 
 ```php
-depositControllerCreateDeposit($deposit_request): \OpenAPI\Client\Model\DepositDto
+depositV2ControllerCreateDepositV2($deposit_request_v2_dto): \OpenAPI\Client\Model\DepositResponseV2Dto
 ```
 
 
@@ -32,13 +32,13 @@ $apiInstance = new OpenAPI\Client\Api\DepositsApi(
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client()
 );
-$deposit_request = new \OpenAPI\Client\Model\DepositRequest(); // \OpenAPI\Client\Model\DepositRequest
+$deposit_request_v2_dto = new \OpenAPI\Client\Model\DepositRequestV2Dto(); // \OpenAPI\Client\Model\DepositRequestV2Dto
 
 try {
-    $result = $apiInstance->depositControllerCreateDeposit($deposit_request);
+    $result = $apiInstance->depositV2ControllerCreateDepositV2($deposit_request_v2_dto);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling DepositsApi->depositControllerCreateDeposit: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling DepositsApi->depositV2ControllerCreateDepositV2: ', $e->getMessage(), PHP_EOL;
 }
 ```
 
@@ -46,11 +46,11 @@ try {
 
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **deposit_request** | [**\OpenAPI\Client\Model\DepositRequest**](../Model/DepositRequest.md)|  | |
+| **deposit_request_v2_dto** | [**\OpenAPI\Client\Model\DepositRequestV2Dto**](../Model/DepositRequestV2Dto.md)|  | |
 
 ### Return type
 
-[**\OpenAPI\Client\Model\DepositDto**](../Model/DepositDto.md)
+[**\OpenAPI\Client\Model\DepositResponseV2Dto**](../Model/DepositResponseV2Dto.md)
 
 ### Authorization
 
@@ -65,10 +65,64 @@ No authorization required
 [[Back to Model list]](../../README.md#models)
 [[Back to README]](../../README.md)
 
-## `depositControllerGetDeposit()`
+## `depositV2ControllerGetDepositPaymentV2()`
 
 ```php
-depositControllerGetDeposit($payment_id): \OpenAPI\Client\Model\GetDepositDto
+depositV2ControllerGetDepositPaymentV2($payment_id): \OpenAPI\Client\Model\PaymentResponseV2Dto
+```
+
+
+
+### Example
+
+```php
+<?php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+
+
+$apiInstance = new OpenAPI\Client\Api\DepositsApi(
+    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+    // This is optional, `GuzzleHttp\Client` will be used as default.
+    new GuzzleHttp\Client()
+);
+$payment_id = 'payment_id_example'; // string
+
+try {
+    $result = $apiInstance->depositV2ControllerGetDepositPaymentV2($payment_id);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling DepositsApi->depositV2ControllerGetDepositPaymentV2: ', $e->getMessage(), PHP_EOL;
+}
+```
+
+### Parameters
+
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **payment_id** | **string**|  | |
+
+### Return type
+
+[**\OpenAPI\Client\Model\PaymentResponseV2Dto**](../Model/PaymentResponseV2Dto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+[[Back to top]](#) [[Back to API list]](../../README.md#endpoints)
+[[Back to Model list]](../../README.md#models)
+[[Back to README]](../../README.md)
+
+## `depositV2ControllerGetDepositV2()`
+
+```php
+depositV2ControllerGetDepositV2($payment_id): \OpenAPI\Client\Model\DepositResponseV2Dto
 ```
 
 
@@ -93,10 +147,10 @@ $apiInstance = new OpenAPI\Client\Api\DepositsApi(
 $payment_id = 'payment_id_example'; // string
 
 try {
-    $result = $apiInstance->depositControllerGetDeposit($payment_id);
+    $result = $apiInstance->depositV2ControllerGetDepositV2($payment_id);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling DepositsApi->depositControllerGetDeposit: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling DepositsApi->depositV2ControllerGetDepositV2: ', $e->getMessage(), PHP_EOL;
 }
 ```
 
@@ -108,7 +162,7 @@ try {
 
 ### Return type
 
-[**\OpenAPI\Client\Model\GetDepositDto**](../Model/GetDepositDto.md)
+[**\OpenAPI\Client\Model\DepositResponseV2Dto**](../Model/DepositResponseV2Dto.md)
 
 ### Authorization
 
@@ -118,160 +172,6 @@ try {
 
 - **Content-Type**: Not defined
 - **Accept**: `application/json`
-
-[[Back to top]](#) [[Back to API list]](../../README.md#endpoints)
-[[Back to Model list]](../../README.md#models)
-[[Back to README]](../../README.md)
-
-## `depositControllerGetDepositPayment()`
-
-```php
-depositControllerGetDepositPayment($payment_id): \OpenAPI\Client\Model\GetDepositPaymentDto
-```
-
-
-
-### Example
-
-```php
-<?php
-require_once(__DIR__ . '/vendor/autoload.php');
-
-
-
-$apiInstance = new OpenAPI\Client\Api\DepositsApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
-$payment_id = 'payment_id_example'; // string
-
-try {
-    $result = $apiInstance->depositControllerGetDepositPayment($payment_id);
-    print_r($result);
-} catch (Exception $e) {
-    echo 'Exception when calling DepositsApi->depositControllerGetDepositPayment: ', $e->getMessage(), PHP_EOL;
-}
-```
-
-### Parameters
-
-| Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **payment_id** | **string**|  | |
-
-### Return type
-
-[**\OpenAPI\Client\Model\GetDepositPaymentDto**](../Model/GetDepositPaymentDto.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: `application/json`
-
-[[Back to top]](#) [[Back to API list]](../../README.md#endpoints)
-[[Back to Model list]](../../README.md#models)
-[[Back to README]](../../README.md)
-
-## `depositControllerSetupSupportingAssets()`
-
-```php
-depositControllerSetupSupportingAssets()
-```
-
-
-
-### Example
-
-```php
-<?php
-require_once(__DIR__ . '/vendor/autoload.php');
-
-
-
-$apiInstance = new OpenAPI\Client\Api\DepositsApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
-
-try {
-    $apiInstance->depositControllerSetupSupportingAssets();
-} catch (Exception $e) {
-    echo 'Exception when calling DepositsApi->depositControllerSetupSupportingAssets: ', $e->getMessage(), PHP_EOL;
-}
-```
-
-### Parameters
-
-This endpoint does not need any parameter.
-
-### Return type
-
-void (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../../README.md#endpoints)
-[[Back to Model list]](../../README.md#models)
-[[Back to README]](../../README.md)
-
-## `depositControllerSyncUpWithFireblocks()`
-
-```php
-depositControllerSyncUpWithFireblocks()
-```
-
-
-
-### Example
-
-```php
-<?php
-require_once(__DIR__ . '/vendor/autoload.php');
-
-
-
-$apiInstance = new OpenAPI\Client\Api\DepositsApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
-
-try {
-    $apiInstance->depositControllerSyncUpWithFireblocks();
-} catch (Exception $e) {
-    echo 'Exception when calling DepositsApi->depositControllerSyncUpWithFireblocks: ', $e->getMessage(), PHP_EOL;
-}
-```
-
-### Parameters
-
-This endpoint does not need any parameter.
-
-### Return type
-
-void (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../../README.md#endpoints)
 [[Back to Model list]](../../README.md#models)

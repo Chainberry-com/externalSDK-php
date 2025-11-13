@@ -1,16 +1,18 @@
 # OpenAPI\Client\OauthApi
 
-All URIs are relative to http://localhost:3001/api/v1, except if the operation defines another base path.
+
+
+All URIs are relative to http://localhost:3001/api/v2, except if the operation defines another base path.
 
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
-| [**oAuthControllerToken()**](OauthApi.md#oAuthControllerToken) | **POST** /oauth/token |  |
+| [**oAuthV2ControllerTokenV2()**](OauthApi.md#oAuthV2ControllerTokenV2) | **POST** /oauth/token |  |
 
 
-## `oAuthControllerToken()`
+## `oAuthV2ControllerTokenV2()`
 
 ```php
-oAuthControllerToken($token_request_dto): \OpenAPI\Client\Model\TokenResponseDto
+oAuthV2ControllerTokenV2($token_request_dto): \OpenAPI\Client\Model\TokenResponseDto
 ```
 
 
@@ -31,10 +33,10 @@ $apiInstance = new OpenAPI\Client\Api\OauthApi(
 $token_request_dto = new \OpenAPI\Client\Model\TokenRequestDto(); // \OpenAPI\Client\Model\TokenRequestDto
 
 try {
-    $result = $apiInstance->oAuthControllerToken($token_request_dto);
+    $result = $apiInstance->oAuthV2ControllerTokenV2($token_request_dto);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling OauthApi->oAuthControllerToken: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling OauthApi->oAuthV2ControllerTokenV2: ', $e->getMessage(), PHP_EOL;
 }
 ```
 

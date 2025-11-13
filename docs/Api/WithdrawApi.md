@@ -1,17 +1,19 @@
 # OpenAPI\Client\WithdrawApi
 
-All URIs are relative to http://localhost:3001/api/v1, except if the operation defines another base path.
+
+
+All URIs are relative to http://localhost:3001/api/v2, except if the operation defines another base path.
 
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
-| [**withdrawControllerCreateWithdraw()**](WithdrawApi.md#withdrawControllerCreateWithdraw) | **POST** /withdraw |  |
-| [**withdrawControllerGetWithdraw()**](WithdrawApi.md#withdrawControllerGetWithdraw) | **GET** /withdraw/{paymentId} |  |
+| [**withdrawV2ControllerCreateWithdrawV2()**](WithdrawApi.md#withdrawV2ControllerCreateWithdrawV2) | **POST** /withdraw |  |
+| [**withdrawV2ControllerGetWithdrawV2()**](WithdrawApi.md#withdrawV2ControllerGetWithdrawV2) | **GET** /withdraw/{paymentId} |  |
 
 
-## `withdrawControllerCreateWithdraw()`
+## `withdrawV2ControllerCreateWithdrawV2()`
 
 ```php
-withdrawControllerCreateWithdraw($withdraw_request): \OpenAPI\Client\Model\WithdrawDto
+withdrawV2ControllerCreateWithdrawV2($withdraw_request_v2_dto): \OpenAPI\Client\Model\WithdrawResponseV2Dto
 ```
 
 
@@ -29,13 +31,13 @@ $apiInstance = new OpenAPI\Client\Api\WithdrawApi(
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client()
 );
-$withdraw_request = new \OpenAPI\Client\Model\WithdrawRequest(); // \OpenAPI\Client\Model\WithdrawRequest
+$withdraw_request_v2_dto = new \OpenAPI\Client\Model\WithdrawRequestV2Dto(); // \OpenAPI\Client\Model\WithdrawRequestV2Dto
 
 try {
-    $result = $apiInstance->withdrawControllerCreateWithdraw($withdraw_request);
+    $result = $apiInstance->withdrawV2ControllerCreateWithdrawV2($withdraw_request_v2_dto);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling WithdrawApi->withdrawControllerCreateWithdraw: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling WithdrawApi->withdrawV2ControllerCreateWithdrawV2: ', $e->getMessage(), PHP_EOL;
 }
 ```
 
@@ -43,11 +45,11 @@ try {
 
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **withdraw_request** | [**\OpenAPI\Client\Model\WithdrawRequest**](../Model/WithdrawRequest.md)|  | |
+| **withdraw_request_v2_dto** | [**\OpenAPI\Client\Model\WithdrawRequestV2Dto**](../Model/WithdrawRequestV2Dto.md)|  | |
 
 ### Return type
 
-[**\OpenAPI\Client\Model\WithdrawDto**](../Model/WithdrawDto.md)
+[**\OpenAPI\Client\Model\WithdrawResponseV2Dto**](../Model/WithdrawResponseV2Dto.md)
 
 ### Authorization
 
@@ -62,10 +64,10 @@ No authorization required
 [[Back to Model list]](../../README.md#models)
 [[Back to README]](../../README.md)
 
-## `withdrawControllerGetWithdraw()`
+## `withdrawV2ControllerGetWithdrawV2()`
 
 ```php
-withdrawControllerGetWithdraw($payment_id): \OpenAPI\Client\Model\GetWithdrawDto
+withdrawV2ControllerGetWithdrawV2($payment_id): \OpenAPI\Client\Model\WithdrawV2Dto
 ```
 
 
@@ -90,10 +92,10 @@ $apiInstance = new OpenAPI\Client\Api\WithdrawApi(
 $payment_id = 'payment_id_example'; // string
 
 try {
-    $result = $apiInstance->withdrawControllerGetWithdraw($payment_id);
+    $result = $apiInstance->withdrawV2ControllerGetWithdrawV2($payment_id);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling WithdrawApi->withdrawControllerGetWithdraw: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling WithdrawApi->withdrawV2ControllerGetWithdrawV2: ', $e->getMessage(), PHP_EOL;
 }
 ```
 
@@ -105,7 +107,7 @@ try {
 
 ### Return type
 
-[**\OpenAPI\Client\Model\GetWithdrawDto**](../Model/GetWithdrawDto.md)
+[**\OpenAPI\Client\Model\WithdrawV2Dto**](../Model/WithdrawV2Dto.md)
 
 ### Authorization
 

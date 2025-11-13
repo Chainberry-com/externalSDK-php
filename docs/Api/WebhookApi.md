@@ -1,17 +1,19 @@
 # OpenAPI\Client\WebhookApi
 
-All URIs are relative to http://localhost:3001/api/v1, except if the operation defines another base path.
+
+
+All URIs are relative to http://localhost:3001/api/v2, except if the operation defines another base path.
 
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
-| [**webhookControllerHandleWebhook()**](WebhookApi.md#webhookControllerHandleWebhook) | **POST** /webhook |  |
-| [**webhookControllerHandleWebhookV2()**](WebhookApi.md#webhookControllerHandleWebhookV2) | **POST** /webhook/v2 |  |
+| [**webhookV2ControllerHandleWebhookV2()**](WebhookApi.md#webhookV2ControllerHandleWebhookV2) | **POST** /webhook |  |
+| [**webhookV2ControllerHandleWebhookV2V2()**](WebhookApi.md#webhookV2ControllerHandleWebhookV2V2) | **POST** /webhook/v2 |  |
 
 
-## `webhookControllerHandleWebhook()`
+## `webhookV2ControllerHandleWebhookV2()`
 
 ```php
-webhookControllerHandleWebhook()
+webhookV2ControllerHandleWebhookV2()
 ```
 
 
@@ -31,9 +33,9 @@ $apiInstance = new OpenAPI\Client\Api\WebhookApi(
 );
 
 try {
-    $apiInstance->webhookControllerHandleWebhook();
+    $apiInstance->webhookV2ControllerHandleWebhookV2();
 } catch (Exception $e) {
-    echo 'Exception when calling WebhookApi->webhookControllerHandleWebhook: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling WebhookApi->webhookV2ControllerHandleWebhookV2: ', $e->getMessage(), PHP_EOL;
 }
 ```
 
@@ -58,10 +60,10 @@ No authorization required
 [[Back to Model list]](../../README.md#models)
 [[Back to README]](../../README.md)
 
-## `webhookControllerHandleWebhookV2()`
+## `webhookV2ControllerHandleWebhookV2V2()`
 
 ```php
-webhookControllerHandleWebhookV2()
+webhookV2ControllerHandleWebhookV2V2()
 ```
 
 
@@ -81,9 +83,9 @@ $apiInstance = new OpenAPI\Client\Api\WebhookApi(
 );
 
 try {
-    $apiInstance->webhookControllerHandleWebhookV2();
+    $apiInstance->webhookV2ControllerHandleWebhookV2V2();
 } catch (Exception $e) {
-    echo 'Exception when calling WebhookApi->webhookControllerHandleWebhookV2: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling WebhookApi->webhookV2ControllerHandleWebhookV2V2: ', $e->getMessage(), PHP_EOL;
 }
 ```
 

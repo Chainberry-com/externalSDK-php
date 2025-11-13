@@ -1,16 +1,18 @@
 # OpenAPI\Client\AssetApi
 
-All URIs are relative to http://localhost:3001/api/v1, except if the operation defines another base path.
+
+
+All URIs are relative to http://localhost:3001/api/v2, except if the operation defines another base path.
 
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
-| [**assetControllerGetSupportedAssets()**](AssetApi.md#assetControllerGetSupportedAssets) | **GET** /asset |  |
+| [**assetV2ControllerGetSupportedAssetsV2()**](AssetApi.md#assetV2ControllerGetSupportedAssetsV2) | **GET** /asset |  |
 
 
-## `assetControllerGetSupportedAssets()`
+## `assetV2ControllerGetSupportedAssetsV2()`
 
 ```php
-assetControllerGetSupportedAssets(): \OpenAPI\Client\Model\SupportedAssetDto[]
+assetV2ControllerGetSupportedAssetsV2(): \OpenAPI\Client\Model\SupportedAssetDto[]
 ```
 
 
@@ -30,10 +32,10 @@ $apiInstance = new OpenAPI\Client\Api\AssetApi(
 );
 
 try {
-    $result = $apiInstance->assetControllerGetSupportedAssets();
+    $result = $apiInstance->assetV2ControllerGetSupportedAssetsV2();
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling AssetApi->assetControllerGetSupportedAssets: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling AssetApi->assetV2ControllerGetSupportedAssetsV2: ', $e->getMessage(), PHP_EOL;
 }
 ```
 
