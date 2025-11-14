@@ -12,6 +12,7 @@ This PHP SDK provides easy integration with the Chainberry API for deposits, cry
 - **API Setup & Configuration**: Easy initialization with environment variables or configuration arrays
 - **Deposit Management**: Create and retrieve deposits with automatic signature generation
 - **Crypto Operations**: Sign payloads and verify signatures using RSA-SHA256
+- **Dual API Coverage**: Target both legacy V1 and modern V2 endpoints from one SDK
 - **Error Handling**: Comprehensive error classes for different types of errors
 - **Retry Logic**: Built-in retry mechanisms with exponential backoff
 - **Validation**: Input validation with customizable rules
@@ -77,7 +78,22 @@ $config = [
 ];
 ```
 
-### Initialize the SDK
+### Environment Matrix (V1 vs V2)
+
+Set `CB_API_ENVIRONMENT` (or the `environment` config key) based on the API generation you intend to call.
+
+| Value            | Constant                      | API Version | Base URL                                    | Typical use case                 |
+| ---------------- | ----------------------------- | ----------- | ------------------------------------------- | -------------------------------- |
+| `staging`        | `Environment::STAGING`        | V1          | `https://api-stg.chainberry.com/api/v1`     | Legacy flows in staging          |
+| `production`     | `Environment::PRODUCTION`     | V1          | `https://api.chainberry.com/api/v1`         | Legacy flows in production       |
+| `local`          | `Environment::LOCAL`          | V1          | `http://192.168.0.226:3001/api/v1`          | Local V1 gateway                 |
+| `staging_v2`     | `Environment::STAGING_V2`     | V2          | `https://api-stg.chainberry.com/api/v2`     | New V2 flows in staging          |
+| `production_v2`  | `Environment::PRODUCTION_V2`  | V2          | `https://api.chainberry.com/api/v2`         | New V2 flows in production       |
+| `local_v2`       | `Environment::LOCAL_V2`       | V2          | `http://192.168.0.226:3001/api/v2`          | Local V2 gateway                 |
+
+> You can call both V1 and V2 helpers from the same process, but the environment you initialize with determines which base URL and OAuth scopes the client uses. Mixing V1 helpers with a V2 environment (or vice versa) will result in authentication failures.
+
+### Initialize the SDK (shared bootstrap)
 
 ```php
 <?php
@@ -93,103 +109,73 @@ BerrySdk::init();
 BerrySdk::init($config);
 ```
 
-### Create a Deposit
+### V2 Quick Start Examples
+
+Make sure your environment is set to `*_v2` before calling the helpers in this section.
 
 ```php
 <?php
 
 use OpenAPI\Client\BerrySdk;
 
-// Initialize the SDK
 BerrySdk::init();
 
-// Create a deposit (V2 models)
-$depositParams = [
+// Create a deposit (V2)
+$deposit = BerrySdk::createDepositV2([
     'amount' => '100.00',
     'currency' => 'USDC',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
     'partnerUserID' => 'user123',
-    'network' => 'ETH', // Optional
-    'partnerPaymentID' => '1234567890'
-];
+    'network' => 'ETH',
+]);
 
-try {
-    $deposit = BerrySdk::createDeposit($depositParams);
-    echo "Deposit created: " . $deposit->getPaymentId();
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
-```
-
-### Create a Withdrawal
-
-```php
-<?php
-
-use OpenAPI\Client\BerrySdk;
-
-// Initialize the SDK
-BerrySdk::init();
-
-// Create a withdrawal (V2 models)
-$withdrawParams = [
+// Create a withdrawal (V2)
+$withdraw = BerrySdk::createWithdrawV2([
     'amount' => '50.00',
     'currency' => 'USDT',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
     'partnerUserID' => 'user123',
-    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6', // Required
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6',
     'network' => 'TRX',
-    'partnerPaymentID' => '1234567890'
-];
+]);
 
-try {
-    $withdraw = BerrySdk::createWithdraw($withdrawParams);
-    echo "Withdrawal created: " . $withdraw->getPaymentId();
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
+// Fetch existing records (V2)
+$depositInfo = BerrySdk::getDepositV2('payment_id');
+$withdrawInfo = BerrySdk::getWithdrawV2('payment_id');
 ```
 
-### Get Deposit Information
+### V1 Quick Start Examples (Legacy)
+
+If you still rely on the original contracts, use `staging`, `production`, or `local` as your `CB_API_ENVIRONMENT`.
 
 ```php
 <?php
 
 use OpenAPI\Client\BerrySdk;
 
-// Initialize the SDK
 BerrySdk::init();
 
-// Get deposit information
-$paymentId = 'your_payment_id';
+// Create a deposit (V1)
+$deposit = BerrySdk::createDeposit([
+    'amount' => '100.00',
+    'currency' => 'USDT',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'tradingAccountLogin' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6',
+]);
 
-try {
-    $deposit = BerrySdk::getDeposit($paymentId);
-    echo "Deposit status: " . $deposit->getStatus();
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
-```
+// Create a withdrawal (V1)
+$withdraw = BerrySdk::createWithdraw([
+    'amount' => '50.00',
+    'currency' => 'USDT',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'tradingAccountLogin' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6',
+]);
 
-### Get Withdrawal Information
-
-```php
-<?php
-
-use OpenAPI\Client\BerrySdk;
-
-// Initialize the SDK
-BerrySdk::init();
-
-// Get withdrawal information
-$paymentId = 'your_payment_id';
-
-try {
-    $withdraw = BerrySdk::getWithdraw($paymentId);
-    echo "Withdrawal status: " . $withdraw->getStatus();
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
+// Fetch existing records (V1)
+$depositInfo = BerrySdk::getDeposit('payment_id');
+$withdrawInfo = BerrySdk::getWithdraw('payment_id');
 ```
 
 ### Crypto Operations

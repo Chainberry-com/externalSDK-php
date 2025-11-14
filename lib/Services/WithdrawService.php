@@ -5,9 +5,6 @@ namespace OpenAPI\Client\Services;
 use OpenAPI\Client\ApiSetup;
 use OpenAPI\Client\Errors\BadRequestError;
 use OpenAPI\Client\Errors\UnauthorizedError;
-use OpenAPI\Client\Model\WithdrawRequestV2Dto;
-use OpenAPI\Client\Model\WithdrawResponseV2Dto;
-use OpenAPI\Client\Model\WithdrawV2Dto;
 use OpenAPI\Client\Utils\CryptoUtils;
 use OpenAPI\Client\Utils\Validators;
 
@@ -18,19 +15,11 @@ class CreateWithdrawParams
 {
     public string $amount;
     public string $currency;
-    public string $callbackUrl;
-    public string $address;
-    public string $partnerUserId;
-    public ?string $network = null;
-    public ?string $tag = null;
-    public ?string $partnerPaymentId = null;
-
-    /** @deprecated Use $partnerUserId instead */
-    public ?string $tradingAccountLogin = null;
-    /** @deprecated Use $network instead */
     public ?string $paymentGatewayName = null;
-    /** @deprecated Field merged into $currency in V2 */
+    public string $callbackUrl;
+    public string $tradingAccountLogin;
     public ?string $withdrawCurrency = null;
+    public string $address;
 }
 
 /**
@@ -47,13 +36,14 @@ class WithdrawService
 
     /**
      * Creates a withdrawal request with a generated signature
-     *
+     * 
      * @param array $params The withdrawal parameters
-     * @return WithdrawRequestV2Dto
+     * @return array A signed withdrawal request object
      * @throws \Exception
      */
-    public function getSignedWithdrawRequest(array $params): WithdrawRequestV2Dto
+    public function getSignedWithdrawRequest(array $params): array
     {
+        // Validate input parameters
         $this->validateCreateWithdrawParams($params);
 
         $apiToken = $this->apiSetup->getConfig()->clientId;
@@ -61,112 +51,180 @@ class WithdrawService
             throw new \Exception("Api token is required but not found in config");
         }
 
-        $currency = strtoupper($this->resolveWithdrawCurrency($params));
         $supportedAssets = $this->apiSetup->getAssetApi()->assetV2ControllerGetSupportedAssetsV2();
-        if ($this->findAssetBySymbol($supportedAssets, $currency) === null) {
+        $supportedAssetCurrency = $this->findAssetBySymbol($supportedAssets, $params['currency']);
+        
+        if (empty($supportedAssetCurrency)) {
             throw new \Exception(
-                "Currency {$currency} is not supported. It should be one of the supported assets returned by the Asset API."
+                "Currency {$params['currency']} is not supported. It should be one of the following BTC, ETH, USDT, USDC, BNB, LTC, TON"
             );
         }
+
+        $withdrawCurrency = $params['withdrawCurrency'] ?? $supportedAssetCurrency['symbol'];
+        
+        if (!empty($params['withdrawCurrency'])) {
+            $supportedAssetWithdrawCurrency = $this->findAssetBySymbol($supportedAssets, $params['withdrawCurrency']);
+            if (empty($supportedAssetWithdrawCurrency)) {
+                throw new \Exception(
+                    "Withdraw Currency {$params['withdrawCurrency']} is not supported. It should be one of the following BTC, ETH, USDT, USDC, BNB, LTC, TON"
+                );
+            }
+        }
+
+        $paymentGatewayName = $params['paymentGatewayName'] ?? null;
+        if (empty($paymentGatewayName)) {
+            if ($this->isToken($withdrawCurrency)) {
+                throw new \Exception("Payment gateway name is required!");
+            }
+            if ($withdrawCurrency === $params['currency']) {
+                $paymentGatewayName = $supportedAssetCurrency['symbol'];
+            } else {
+                throw new \Exception(
+                    "Withdraw currency {$withdrawCurrency} is not supported. Please specify a different withdraw currency or payment gateway."
+                );
+            }
+        }
+
+        // Create the payload to sign (excluding signature field)
+        $payloadToSign = [
+            'amount' => $params['amount'],
+            'currency' => $params['currency'],
+            'paymentGatewayName' => $paymentGatewayName,
+            'callbackUrl' => $params['callbackUrl'],
+            'apiToken' => $apiToken,
+            'timestamp' => time(),
+            'tradingAccountLogin' => $params['tradingAccountLogin'],
+            'withdrawCurrency' => $withdrawCurrency,
+            'address' => $params['address'],
+        ];
+
+        $excludeKeys = ['signature'];
+
+        $additionalParams = array_diff_key(
+            $params,
+            $payloadToSign,
+            array_flip($excludeKeys)
+        );
+        $payloadToSign = array_merge($payloadToSign, $additionalParams);
 
         $privateKey = $this->apiSetup->getConfig()->privateKey;
         if (empty($privateKey)) {
             throw new \Exception("Private key is required but not found in config");
         }
 
-        $partnerUserId = $this->resolvePartnerUserId($params);
-        $network = $this->resolveNetwork($params);
-        $partnerPaymentId = $this->resolvePartnerPaymentId($params);
-        $tag = $this->resolveTag($params);
-        $address = $this->resolveAddress($params);
-
-        $payloadToSign = [
-            'amount' => (string) $params['amount'],
-            'currency' => $currency,
-            'address' => $address,
-            'callbackUrl' => $params['callbackUrl'],
-            'apiToken' => $apiToken,
-            'timestamp' => time(),
-            'partnerUserID' => $partnerUserId,
-        ];
-
-        if ($network !== null) {
-            $payloadToSign['network'] = $network;
-        }
-
-        if ($partnerPaymentId !== null) {
-            $payloadToSign['partnerPaymentID'] = $partnerPaymentId;
-        }
-
-        if ($tag !== null) {
-            $payloadToSign['tag'] = $tag;
-        }
-
-        $signedPayload = CryptoUtils::signPayload($payloadToSign, $privateKey);
-
-        return $this->mapToWithdrawRequestDto($signedPayload);
+        // Generate signature using the utils function
+        return CryptoUtils::signPayload($payloadToSign, $privateKey);
     }
 
     /**
      * Creates and submits a withdrawal request
-     *
+     * 
      * @param array $params The withdrawal parameters
-     * @return WithdrawResponseV2Dto Withdrawal response
+     * @return \OpenAPI\ClientV1\Model\WithdrawDto Withdrawal response
      * @throws BadRequestError
      * @throws UnauthorizedError
      * @throws \Exception
      */
-    public function createWithdraw(array $params): WithdrawResponseV2Dto
+    public function createWithdraw(array $params): \OpenAPI\ClientV1\Model\WithdrawDto
     {
-        $requestDto = $this->getSignedWithdrawRequest($params);
+        $signedRequest = $this->getSignedWithdrawRequest($params);
 
         try {
-            return $this->apiSetup
-                ->getWithdrawApi()
-                ->withdrawV2ControllerCreateWithdrawV2($requestDto);
+            $response = $this->apiSetup->getWithdrawApi()->withdrawControllerCreateWithdrawV1($signedRequest);
+            return $response;
         } catch (\Exception $error) {
+            // Re-throw the original error - let the caller handle specific error types
             throw $error;
         }
     }
 
     /**
-     * Gets withdrawal information
-     *
+     * Gets withdrawal information with automatic JWT token authentication and retry logic
+     * 
      * @param string $paymentId Payment ID
-     * @param int $maxRetries Maximum retry attempts (kept for backward compatibility)
-     * @return WithdrawV2Dto Withdrawal information
+     * @param int $maxRetries Maximum retry attempts
+     * @return \OpenAPI\ClientV1\Model\GetWithdrawDto Withdrawal information
      * @throws BadRequestError
      * @throws UnauthorizedError
      * @throws \Exception
      */
-    public function getWithdraw(string $paymentId, int $maxRetries = 2): WithdrawV2Dto
+    public function getWithdraw(string $paymentId, int $maxRetries = 2): \OpenAPI\ClientV1\Model\GetWithdrawDto
     {
-        try {
-            return $this->apiSetup
-                ->getWithdrawApi()
-                ->withdrawV2ControllerGetWithdrawV2($paymentId);
-        } catch (\Exception $error) {
-            if ($this->isAuthenticationError($error)) {
-                $this->apiSetup->ensureAccessToken();
-                return $this->apiSetup
-                    ->getWithdrawApi()
-                    ->withdrawV2ControllerGetWithdrawV2($paymentId);
-            }
+        $lastError = null;
 
-            throw $error;
+        for ($attempt = 0; $attempt <= $maxRetries; $attempt++) {
+            try {
+                // On first attempt, try without getting a new token (use existing if available)
+                if ($attempt === 0) {
+                    try {
+                        // Make the API call with whatever token is currently set (if any)
+                        $response = $this->apiSetup->getWithdrawApi()->withdrawControllerGetWithdrawV1($paymentId);
+
+                        if (!empty($response)) {
+                            return $response;
+                        } else {
+                            throw new \Exception("No data received from API");
+                        }
+                    } catch (\Exception $error) {
+                        // Check if it's an authentication error (401)
+                        $isAuthError = $this->isAuthenticationError($error);
+
+                        // If it's not an auth error, throw immediately
+                        if (!$isAuthError) {
+                            throw $error;
+                        }
+
+                        // If it's an auth error, continue to the next attempt to get a fresh token
+                        $lastError = $error;
+                    }
+                }
+
+                // For retry attempts or if first attempt failed with auth error, get a fresh token
+                $this->apiSetup->ensureAccessToken();
+
+                // Make the API call
+                $response = $this->apiSetup->getWithdrawApi()->withdrawControllerGetWithdrawV1($paymentId);
+
+                if (!empty($response)) {
+                    return $response;
+                } else {
+                    throw new \Exception("No data received from API");
+                }
+            } catch (\Exception $error) {
+                $lastError = $error;
+
+                // Check if it's an authentication error (401)
+                $isAuthError = $this->isAuthenticationError($error);
+
+                // If it's not an auth error or we've exhausted retries, throw the error
+                if (!$isAuthError || $attempt === $maxRetries) {
+                    throw $error;
+                }
+
+                // For auth errors, wait a bit before retrying (exponential backoff)
+                if ($attempt < $maxRetries) {
+                    $delay = pow(2, $attempt) * 1000; // 1s, 2s, 4s...
+                    usleep($delay * 1000); // Convert to microseconds
+                    error_log("Authentication failed, retrying in {$delay}ms... (attempt " . ($attempt + 1) . "/" . ($maxRetries + 1) . ")");
+                }
+            }
         }
+
+        // This should never be reached, but just in case
+        throw $lastError ?? new \Exception("Failed to get withdrawal information after all retries");
     }
 
     /**
      * Gets withdrawal information with automatic JWT token authentication using environment variables
-     *
+     * 
      * @param string $paymentId The payment ID to retrieve
      * @param int $maxRetries Maximum number of retries (defaults to 2)
-     * @return WithdrawV2Dto Withdrawal information
+     * @return \OpenAPI\ClientV1\Model\GetWithdrawDto Withdrawal information
      * @throws \Exception
      */
-    public function getWithdrawWithEnvAuth(string $paymentId, int $maxRetries = 2): WithdrawV2Dto
+    public function getWithdrawWithEnvAuth(string $paymentId, int $maxRetries = 2): \OpenAPI\ClientV1\Model\GetWithdrawDto
     {
+        // Check for required environment variables
         $clientId = getenv('CB_API_CLIENT_ID');
         $clientSecret = getenv('CB_API_CLIENT_SECRET');
 
@@ -179,132 +237,55 @@ class WithdrawService
 
     /**
      * Validate create withdrawal parameters
-     *
+     * 
      * @param array $params Parameters to validate
+     * @throws \Exception
      */
     private function validateCreateWithdrawParams(array $params): void
     {
         Validators::amount()->validateAndThrow($params['amount'] ?? null, 'Amount');
-
-        $currency = $this->resolveWithdrawCurrency($params);
-        Validators::currency()->validateAndThrow($currency !== null ? strtoupper($currency) : null, 'Currency');
-
         Validators::callbackUrl()->validateAndThrow($params['callbackUrl'] ?? null, 'Callback URL');
-
-        $partnerUserId = $this->resolvePartnerUserId($params);
-        Validators::partnerUserId()->validateAndThrow($partnerUserId, 'Partner User ID');
-
-        Validators::address()->validateAndThrow($this->resolveAddress($params), 'Address');
-
-        $network = $params['network'] ?? $params['paymentGatewayName'] ?? null;
-        if ($network !== null && $network !== '') {
-            Validators::optionalNetwork('Network')->validateAndThrow(strtoupper($network), 'Network');
+        Validators::tradingAccountLogin()->validateAndThrow($params['tradingAccountLogin'] ?? null, 'Trading Account Login');
+        
+        // Validate address is provided
+        if (empty($params['address'])) {
+            throw new \Exception("Address is required");
         }
-    }
-
-    private function resolvePartnerUserId(array $params): string
-    {
-        return (string) ($params['partnerUserID']
-            ?? $params['partnerUserId']
-            ?? $params['tradingAccountLogin']
-            ?? '');
-    }
-
-    private function resolveNetwork(array $params): ?string
-    {
-        $network = $params['network'] ?? $params['paymentGatewayName'] ?? null;
-        return $network !== null && $network !== ''
-            ? strtoupper((string) $network)
-            : null;
-    }
-
-    private function resolvePartnerPaymentId(array $params): ?string
-    {
-        $partnerPaymentId = $params['partnerPaymentID'] ?? $params['partnerPaymentId'] ?? null;
-        return $partnerPaymentId !== null && $partnerPaymentId !== ''
-            ? (string) $partnerPaymentId
-            : null;
-    }
-
-    private function resolveTag(array $params): ?string
-    {
-        $tag = $params['tag'] ?? $params['memo'] ?? null;
-        return $tag !== null && $tag !== '' ? (string) $tag : null;
-    }
-
-    private function resolveAddress(array $params): string
-    {
-        return (string) ($params['address'] ?? '');
-    }
-
-    private function resolveWithdrawCurrency(array $params): string
-    {
-        return (string) ($params['withdrawCurrency']
-            ?? $params['currency']
-            ?? '');
-    }
-
-    private function mapToWithdrawRequestDto(array $signedPayload): WithdrawRequestV2Dto
-    {
-        $data = [
-            'callback_url' => $signedPayload['callbackUrl'],
-            'api_token' => $signedPayload['apiToken'],
-            'timestamp' => (float) $signedPayload['timestamp'],
-            'signature' => $signedPayload['signature'],
-            'partner_user_id' => $signedPayload['partnerUserID'],
-            'amount' => (string) $signedPayload['amount'],
-            'currency' => $signedPayload['currency'],
-            'address' => $signedPayload['address'],
-        ];
-
-        if (array_key_exists('partnerPaymentID', $signedPayload)) {
-            $data['partner_payment_id'] = $signedPayload['partnerPaymentID'];
-        }
-
-        if (array_key_exists('network', $signedPayload)) {
-            $data['network'] = $signedPayload['network'];
-        }
-
-        if (array_key_exists('tag', $signedPayload)) {
-            $data['tag'] = $signedPayload['tag'];
-        }
-
-        return new WithdrawRequestV2Dto($data);
     }
 
     /**
      * Find asset by symbol in supported assets
-     *
+     * 
      * @param array $supportedAssets Supported assets array
      * @param string $symbol Symbol to find
      * @return array|null Found asset or null
      */
     private function findAssetBySymbol(array $supportedAssets, string $symbol): ?array
     {
-        $needle = strtoupper($symbol);
-
         foreach ($supportedAssets as $asset) {
-            $assetSymbol = null;
-
-            if (is_object($asset) && method_exists($asset, 'getSymbol')) {
-                $assetSymbol = strtoupper($asset->getSymbol());
-            } elseif (is_array($asset) && isset($asset['symbol'])) {
-                $assetSymbol = strtoupper($asset['symbol']);
-            }
-
-            if ($assetSymbol === $needle) {
+            if ($asset['symbol'] === $symbol) {
+                // Convert SupportedAssetDto to array if it's an object
                 if (is_object($asset)) {
                     return [
                         'symbol' => $asset->getSymbol(),
-                        'name' => method_exists($asset, 'getName') ? $asset->getName() : null,
+                        'name' => $asset->getName()
                     ];
                 }
-
                 return $asset;
             }
         }
-
         return null;
+    }
+
+    /**
+     * Check if value is a token
+     * 
+     * @param string $value Value to check
+     * @return bool True if token
+     */
+    private function isToken(string $value): bool
+    {
+        return strtolower($value) === 'usdt' || strtolower($value) === 'usdc';
     }
 
     /**

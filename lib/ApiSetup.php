@@ -4,11 +4,13 @@ namespace OpenAPI\Client;
 
 use OpenAPI\Client\Api\AssetApi;
 use OpenAPI\Client\Api\ConvertApi;
-use OpenAPI\Client\Api\DepositsApi;
+use OpenAPI\Client\Api\DepositsApi as DepositsApiV2;
+use OpenAPI\ClientV1\Api\DepositsApi;
 use OpenAPI\Client\Api\OauthApi;
 use OpenAPI\Client\Api\TestApi;
-use OpenAPI\Client\Api\WithdrawApi;
-use OpenAPI\Client\Configuration;
+use OpenAPI\Client\Api\WithdrawApi as WithdrawApiV2;
+use OpenAPI\ClientV1\Api\WithdrawApi;
+use OpenAPI\Client\Configuration as ConfigurationV2;
 use OpenAPI\Client\Errors\BadRequestError;
 use OpenAPI\Client\Errors\ConfigurationError;
 use OpenAPI\Client\Errors\NetworkError;
@@ -16,12 +18,17 @@ use OpenAPI\Client\Errors\UnauthorizedError;
 use OpenAPI\Client\Model\InitTestParamsDto;
 use OpenAPI\Client\Model\TokenRequestDto;
 use OpenAPI\Client\Utils\CryptoUtils;
+use OpenAPI\ClientV1\Api\AutoConversionApi;
+use OpenAPI\ClientV1\Configuration;
 
 /**
  * Environment enum
  */
 class Environment
 {
+    public const STAGING_V2 = 'staging_v2';
+    public const PRODUCTION_V2 = 'production_v2';
+    public const LOCAL_V2 = 'local_v2';
     public const STAGING = 'staging';
     public const PRODUCTION = 'production';
     public const LOCAL = 'local';
@@ -59,18 +66,25 @@ class ApiSetup
     private static ?ApiSetup $instance = null;
     private ?ExternalApiConfig $config = null;
     private ?Configuration $configuration = null;
+    private ?ConfigurationV2 $configurationV2 = null;
     private ?AssetApi $assetApi = null;
-    private ?ConvertApi $autoConversionApi = null;
-    private ?DepositsApi $depositsApi = null;
+    private ?ConvertApi $autoConversionApiV2 = null;
+    private ?AutoConversionApi $autoConversionApi = null;
+    private ?DepositsApiV2 $depositsApiV2 = null;
     private ?OauthApi $oauthApi = null;
     private ?TestApi $testApi = null;
-    private ?WithdrawApi $withdrawApi = null;
+    private ?WithdrawApiV2 $withdrawApiV2 = null;
     private ?string $accessToken = null;
+    private ?DepositsApi $depositsApi = null;
+    private ?WithdrawApi $withdrawApi = null;
 
     private const DEFAULT_BASE_URLS = [
-        Environment::STAGING => 'https://api-stg.chainberry.com/api/v2',
-        Environment::PRODUCTION => 'https://api.chainberry.com/api/v2',
-        Environment::LOCAL => 'http://192.168.0.226:3001/api/v2',
+        Environment::STAGING => 'https://api-stg.chainberry.com/api/v1',
+        Environment::PRODUCTION => 'https://api.chainberry.com/api/v1',
+        Environment::LOCAL => 'http://192.168.0.226:3001/api/v1',
+        Environment::STAGING_V2 => 'https://api-stg.chainberry.com/api/v2',
+        Environment::PRODUCTION_V2 => 'https://api.chainberry.com/api/v2',
+        Environment::LOCAL_V2 => 'http://192.168.0.226:3001/api/v2',
     ];
 
     private const CHAINBERRY_PUBLIC_KEYS = [
@@ -101,8 +115,34 @@ LwavgC++lnO/iVXHVln5+DDCSSICkII6RGeYoXMev/SvvV1FoQ7tnC6Z069Uh+Uy
 nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
 0QIDAQAB
 -----END PUBLIC KEY-----",
+        Environment::STAGING_V2 => "-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu9hu+/AZCRVnf3dapRJX
+fZEGaIO7vm8OBHhGNW+2T9ZKHYJw5Mid2V5IQ3TSyVMr8GfSiaxK94z7mGXFKfkt
+3mQE0MLN8lwTGWC7RdtswUoCB91KNP4vhq06VGLC6F+TlcNoIk4F2o30JwZgixDy
+FHUpPXuUTvKte63ur+Na/+yBDsWFPGaxGPNMYKoSaOnJK1cmNj2sr8SqfsNK9LAx
+BAWPWFPwzfiIjwOk1udbeMuQ07uRJWwrLevZ7OuMxZvYees/Wg5+25R1OzOY/jis
+StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
+0QIDAQAB
+-----END PUBLIC KEY-----",
+        Environment::PRODUCTION_V2 => "-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoxUR0G/8yIIkLWAivkgd
+2pMzGyk39uR4O/ZdqJ3vUSsmUBoAHpahzyfn/hT/pZC8/13KA1heB5LdTU91LzWg
+667nqd3fFgUx8g4b9BuOWEpBl/VNIbIj/nfU0QxW8s/KSJ8pmIeuYgCqhYiaCpLD
+2dpfbf7kMlzXci3kApqTMXiJTO5XHlGhhXpKggHwRIIglsK/lTxnw0MuskywV5gf
+V2sj6YxNpGQ+uaY3aO6yTGRU0ZBTrHfxJlsRSeiaTXxX9QhRUPjQRAk5OuLrF5kO
+keEKz/U+LCYEW27a3AfFzs0d1D/zIxCEBCft/EwhMHqM+fnSSk/DdxFt63m789IO
+BwIDAQAB
+-----END PUBLIC KEY-----",
+        Environment::LOCAL_V2 => "-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwvCN/n7etTqjNJ0M0JmU
+cGPaXoc6ttN8f3KT02ZV8CpGOV3ekUIwgvXw6mCq4jz2mmGkfnjneuWbWMru3w4I
+6xngWdMeJqcVoOviTPn9wuASnsAu4imMxOxRoyLNDqstOg1g0N4wISaCazmCwJXW
+LwavgC++lnO/iVXHVln5+DDCSSICkII6RGeYoXMev/SvvV1FoQ7tnC6Z069Uh+Uy
+5NYHZrQ/lVIoq9fi0WLrhMzDWYR5ncDjeKntmMb2B2h7Prs3/RXx7bvV1BzSBkE9
+nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
+0QIDAQAB
+-----END PUBLIC KEY-----",
     ];
-
     /**
      * Get singleton instance
      * 
@@ -130,16 +170,24 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
         $this->config = $finalConfig;
 
         // Initialize configuration
+        $this->configurationV2 = new ConfigurationV2();
+        $this->configurationV2->setHost($finalConfig->baseUrl);
+        $this->configurationV2->setAccessToken($this->accessToken);
+
         $this->configuration = new Configuration();
         $this->configuration->setHost($finalConfig->baseUrl);
         $this->configuration->setAccessToken($this->accessToken);
 
         // Initialize API instances
-        $this->assetApi = new AssetApi(null, $this->configuration);
-        $this->autoConversionApi = new ConvertApi(null, $this->configuration);
+        $this->assetApi = new AssetApi(null, $this->configurationV2);
+        $this->autoConversionApiV2 = new ConvertApi(null, $this->configurationV2);
+        $this->depositsApiV2 = new DepositsApiV2(null, $this->configurationV2);
+        $this->oauthApi = new OauthApi(null, $this->configurationV2);
+        $this->testApi = new TestApi(null, $this->configurationV2);
+        $this->withdrawApiV2 = new WithdrawApiV2(null, $this->configurationV2);
+
+        $this->autoConversionApi = new AutoConversionApi(null, $this->configuration);
         $this->depositsApi = new DepositsApi(null, $this->configuration);
-        $this->oauthApi = new OauthApi(null, $this->configuration);
-        $this->testApi = new TestApi(null, $this->configuration);
         $this->withdrawApi = new WithdrawApi(null, $this->configuration);
 
         try {
@@ -284,7 +332,7 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
      */
     private function parseEnvironment(string $env): ?string
     {
-        $normalized = strtolower($env);
+        $normalized = strtolower($env);        
         if (in_array($normalized, ['staging', 'dev', 'development'])) {
             return Environment::STAGING;
         }
@@ -293,6 +341,15 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
         }
         if (in_array($normalized, ['local'])) {
             return Environment::LOCAL;
+        }
+        if (in_array($normalized, ['staging_v2', 'dev_v2', 'development_v2'])) {
+            return Environment::STAGING_V2;
+        }
+        if (in_array($normalized, ['production_v2', 'prod_v2'])) {
+            return Environment::PRODUCTION_V2;
+        }
+        if (in_array($normalized, ['local_v2'])) {
+            return Environment::LOCAL_V2;
         }
         return null;
     }
@@ -329,7 +386,15 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
 
             if ($response && $response->getAccessToken()) {
                 $this->accessToken = $response->getAccessToken();
-                $this->configuration->setAccessToken($this->accessToken);
+
+                if ($this->configuration !== null) {
+                    $this->configuration->setAccessToken($this->accessToken);
+                }
+
+                if ($this->configurationV2 !== null) {
+                    $this->configurationV2->setAccessToken($this->accessToken);
+                }
+
                 return $this->accessToken;
             }
         } catch (\Exception $error) {
@@ -354,7 +419,7 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
             throw new UnauthorizedError("Failed to obtain access token");
         }
 
-        if ($this->configuration === null) {
+        if ($this->configuration === null || $this->configurationV2 === null) {
             throw new ConfigurationError("API instance is not initialized");
         }
 
@@ -386,9 +451,29 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
      * 
      * @return ConvertApi
      */
-    public function getAutoConversionApi(): ConvertApi
+    public function getAutoConversionApiV2(): ConvertApi
+    {
+        return $this->autoConversionApiV2;
+    }
+
+    /**
+     * Get Auto Conversion API instance
+     * 
+     * @return AutoConversionApi
+     */
+    public function getAutoConversionApi(): AutoConversionApi
     {
         return $this->autoConversionApi;
+    }
+
+    /**
+     * Get Deposits API instance
+     * 
+     * @return DepositsApiV2
+     */
+    public function getDepositsApiV2(): DepositsApiV2
+    {
+        return $this->depositsApiV2;
     }
 
     /**
@@ -399,6 +484,16 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
     public function getDepositsApi(): DepositsApi
     {
         return $this->depositsApi;
+    }
+
+    /**
+     * Get Withdraw API instance
+     * 
+     * @return WithdrawApi
+     */
+    public function getWithdrawApi(): WithdrawApi
+    {
+        return $this->withdrawApi;
     }
 
     /**
@@ -424,11 +519,11 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
     /**
      * Get Withdraw API instance
      * 
-     * @return WithdrawApi
+     * @return WithdrawApiV2
      */
-    public function getWithdrawApi(): WithdrawApi
+    public function getWithdrawApiV2(): WithdrawApiV2
     {
-        return $this->withdrawApi;
+        return $this->withdrawApiV2;
     }
 
     /**

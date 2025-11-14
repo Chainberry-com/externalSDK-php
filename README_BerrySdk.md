@@ -7,6 +7,7 @@ This is a PHP implementation of the berrySdk functionality, providing easy integ
 - **API Setup & Configuration**: Easy initialization with environment variables or configuration arrays
 - **Deposit Management**: Create and retrieve deposits with automatic signature generation
 - **Withdrawal Management**: Create and retrieve withdrawals with automatic signature generation
+- **Dual API Coverage**: Legacy V1 and modern V2 endpoints are both available through a single SDK bootstrap
 - **Auto Conversion**: Convert between different cryptocurrencies with automatic rate calculation
 - **Crypto Operations**: Sign payloads and verify signatures using RSA-SHA256
 - **Error Handling**: Comprehensive error classes for different types of errors
@@ -50,9 +51,24 @@ $config = [
 ];
 ```
 
+## Choosing an Environment (V1 vs V2)
+
+Set `CB_API_ENVIRONMENT` (or the `$config['environment']` value) to match the API version you want to call. Both generations can coexist in the same project—just initialize once with the environment that matches the endpoints you plan to hit.
+
+| Value          | `Environment::*` constant | API version | Base URL                                       | When to use                                               |
+| -------------- | ------------------------- | ----------- | ---------------------------------------------- | --------------------------------------------------------- |
+| `staging`      | `Environment::STAGING`    | V1          | `https://api-stg.chainberry.com/api/v1`        | Legacy flows against the staging cluster                  |
+| `production`   | `Environment::PRODUCTION` | V1          | `https://api.chainberry.com/api/v1`            | Legacy flows in production                                |
+| `local`        | `Environment::LOCAL`      | V1          | `http://192.168.0.226:3001/api/v1`             | Self-hosted/local API gateway                             |
+| `staging_v2`   | `Environment::STAGING_V2` | V2          | `https://api-stg.chainberry.com/api/v2`        | New V2 endpoints in staging                               |
+| `production_v2`| `Environment::PRODUCTION_V2`| V2        | `https://api.chainberry.com/api/v2`            | New V2 endpoints in production                            |
+| `local_v2`     | `Environment::LOCAL_V2`   | V2          | `http://192.168.0.226:3001/api/v2`             | Local development targeting V2 routes                     |
+
+**Tip:** You can call both V1 and V2 helper methods from the same process. Just make sure the environment you initialize with matches the endpoints you want to invoke. For example, if you call `BerrySdk::createWithdrawV2()` while the SDK is initialized with `Environment::STAGING`, the V2 HTTP client will still try to call `/api/v2` on a V1 hostname and authentication will fail.
+
 ## Quick Start
 
-### Initialize the SDK
+### Initialize the SDK (shared for V1 + V2)
 
 ```php
 <?php
@@ -68,17 +84,19 @@ BerrySdk::init();
 BerrySdk::init($config);
 ```
 
-### Create a Deposit
+### V2 Workflow Examples
+
+> Make sure `CB_API_ENVIRONMENT` (or `$config['environment']`) ends with `_v2` before calling these helpers.
+
+#### Create a Deposit (V2)
 
 ```php
 <?php
 
 use OpenAPI\Client\BerrySdk;
 
-// Initialize the SDK
 BerrySdk::init();
 
-// Create a deposit (V2 models)
 $depositParams = [
     'amount' => '100.00',
     'currency' => 'USDC',
@@ -88,25 +106,19 @@ $depositParams = [
     'partnerPaymentID' => '1234567890'
 ];
 
-try {
-    $deposit = BerrySdk::createDeposit($depositParams);
-    echo "Deposit created: " . $deposit->getPaymentId();
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
+$deposit = BerrySdk::createDepositV2($depositParams);
+echo "Deposit created: " . $deposit->getPaymentId();
 ```
 
-### Create a Withdrawal
+#### Create a Withdrawal (V2)
 
 ```php
 <?php
 
 use OpenAPI\Client\BerrySdk;
 
-// Initialize the SDK
 BerrySdk::init();
 
-// Create a withdrawal (V2 models)
 $withdrawParams = [
     'amount' => '50.00',
     'currency' => 'USDT',
@@ -117,67 +129,49 @@ $withdrawParams = [
     'partnerPaymentID' => '1234567890'
 ];
 
-try {
-    $withdraw = BerrySdk::createWithdraw($withdrawParams);
-    echo "Withdrawal created: " . $withdraw->getPaymentId();
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
+$withdraw = BerrySdk::createWithdrawV2($withdrawParams);
+echo "Withdrawal created: " . $withdraw->getPaymentId();
 ```
 
-### Get Deposit Information
+#### Get Deposit Information (V2)
 
 ```php
 <?php
 
 use OpenAPI\Client\BerrySdk;
 
-// Initialize the SDK
 BerrySdk::init();
 
-// Get deposit information
 $paymentId = 'your_payment_id';
+$deposit = BerrySdk::getDepositV2($paymentId);
 
-try {
-    $deposit = BerrySdk::getDeposit($paymentId);
-    echo "Deposit status: " . $deposit->getStatus();
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
+echo "Deposit status: " . $deposit->getStatus();
 ```
 
-### Get Withdrawal Information
+#### Get Withdrawal Information (V2)
 
 ```php
 <?php
 
 use OpenAPI\Client\BerrySdk;
 
-// Initialize the SDK
 BerrySdk::init();
 
-// Get withdrawal information
 $paymentId = 'your_payment_id';
+$withdraw = BerrySdk::getWithdrawV2($paymentId);
 
-try {
-    $withdraw = BerrySdk::getWithdraw($paymentId);
-    echo "Withdrawal status: " . $withdraw->getStatus();
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
+echo "Withdrawal status: " . $withdraw->getStatus();
 ```
 
-### Create an Auto Conversion
+#### Create an Auto Conversion (V2)
 
 ```php
 <?php
 
 use OpenAPI\Client\BerrySdk;
 
-// Initialize the SDK
 BerrySdk::init();
 
-// Create an auto conversion (V2 models)
 $autoConversionParams = [
     'fromAmount' => '100.00',
     'fromCurrency' => 'USDT',
@@ -188,15 +182,102 @@ $autoConversionParams = [
     'partnerPaymentID' => '1234567890'
 ];
 
-try {
-    $autoConversion = BerrySdk::createAutoConversion($autoConversionParams);
-    echo "Auto conversion created: " . $autoConversion->getPaymentId();
-    echo "Checkout URL: " . $autoConversion->getCheckoutUrl();
-    echo "Conversion Rate: " . $autoConversion->getConversionRate();
-    echo "To Amount: " . $autoConversion->getToAmount();
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
+$autoConversion = BerrySdk::createAutoConversionV2($autoConversionParams);
+echo "Auto conversion created: " . $autoConversion->getPaymentId();
+```
+
+### V1 Workflow Examples (Legacy)
+
+> Use `staging`, `production`, or `local` for `CB_API_ENVIRONMENT` when calling the legacy helpers below. These are still fully supported for partners that have not migrated to the V2 contracts yet.
+
+#### Create a Deposit (V1)
+
+```php
+<?php
+
+use OpenAPI\Client\BerrySdk;
+
+BerrySdk::init();
+
+$deposit = BerrySdk::createDeposit([
+    'amount' => '100.00',
+    'currency' => 'USDT',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'tradingAccountLogin' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
+]);
+
+echo "Deposit created: " . $deposit->getPaymentId();
+```
+
+#### Create a Withdrawal (V1)
+
+```php
+<?php
+
+use OpenAPI\Client\BerrySdk;
+
+BerrySdk::init();
+
+$withdraw = BerrySdk::createWithdraw([
+    'amount' => '50.00',
+    'currency' => 'USDT',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'tradingAccountLogin' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
+]);
+
+echo "Withdrawal created: " . $withdraw->getPaymentId();
+```
+
+#### Get Deposit Information (V1)
+
+```php
+<?php
+
+use OpenAPI\Client\BerrySdk;
+
+BerrySdk::init();
+
+$paymentId = 'your_payment_id';
+$deposit = BerrySdk::getDeposit($paymentId);
+
+echo "Deposit status: " . $deposit->getStatus();
+```
+
+#### Get Withdrawal Information (V1)
+
+```php
+<?php
+
+use OpenAPI\Client\BerrySdk;
+
+BerrySdk::init();
+
+$paymentId = 'your_payment_id';
+$withdraw = BerrySdk::getWithdraw($paymentId);
+
+echo "Withdrawal status: " . $withdraw->getStatus();
+```
+
+#### Create an Auto Conversion (V1)
+
+```php
+<?php
+
+use OpenAPI\Client\BerrySdk;
+
+BerrySdk::init();
+
+$autoConversion = BerrySdk::createAutoConversion([
+    'amount' => '100.00',
+    'currency' => 'USDT',
+    'toCurrency' => 'USDC',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'tradingAccountLogin' => 'user123'
+]);
+
+echo "Auto conversion created: " . $autoConversion->getPaymentId();
 ```
 
 ### Crypto Operations
@@ -291,6 +372,34 @@ $deposit = $depositService->createDeposit([
 $depositInfo = $depositService->getDeposit('payment_id', 3); // 3 retries
 ```
 
+```php
+<?php
+
+use OpenAPI\Client\Services\DepositServiceV2;
+
+BerrySdk::init();
+
+$depositServiceV2 = new DepositServiceV2();
+
+$signedRequest = $depositServiceV2->getSignedDepositRequest([
+    'amount' => '100.00',
+    'currency' => 'USDC',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'partnerUserID' => 'user123',
+    'network' => 'ETH',
+]);
+
+$deposit = $depositServiceV2->createDeposit([
+    'amount' => '100.00',
+    'currency' => 'USDC',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'partnerUserID' => 'user123',
+    'network' => 'ETH',
+]);
+
+$depositInfo = $depositServiceV2->getDeposit('payment_id', 3);
+```
+
 ### Using the Withdraw Service
 
 ```php
@@ -326,6 +435,36 @@ $withdraw = $withdrawService->createWithdraw([
 
 // Get withdrawal with retry logic
 $withdrawInfo = $withdrawService->getWithdraw('payment_id', 3); // 3 retries
+```
+
+```php
+<?php
+
+use OpenAPI\Client\Services\WithdrawServiceV2;
+
+BerrySdk::init();
+
+$withdrawServiceV2 = new WithdrawServiceV2();
+
+$signedRequest = $withdrawServiceV2->getSignedWithdrawRequest([
+    'amount' => '50.00',
+    'currency' => 'USDT',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'partnerUserID' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6',
+    'network' => 'TRX',
+]);
+
+$withdraw = $withdrawServiceV2->createWithdraw([
+    'amount' => '50.00',
+    'currency' => 'USDT',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'partnerUserID' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6',
+    'network' => 'TRX',
+]);
+
+$withdrawInfo = $withdrawServiceV2->getWithdraw('payment_id', 3);
 ```
 
 ### Using the Auto Conversion Service
@@ -371,6 +510,40 @@ echo "Final Currency: " . $autoConversion->getFinalCurrency();
 echo "Transaction Amount: " . $autoConversion->getTransactionAmount();
 echo "Net Amount: " . $autoConversion->getNetAmount();
 echo "Processing Fee: " . $autoConversion->getProcessingFee();
+```
+
+```php
+<?php
+
+use OpenAPI\Client\Services\AutoConversionServiceV2;
+
+BerrySdk::init();
+
+$autoConversionServiceV2 = new AutoConversionServiceV2();
+
+$signedRequest = $autoConversionServiceV2->getSignedAutoConversionRequest([
+    'fromAmount' => '100.00',
+    'fromCurrency' => 'USDT',
+    'toCurrency' => 'USDC',
+    'toNetwork' => 'ETH',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'partnerUserID' => 'user123',
+    'partnerPaymentID' => '1234567890'
+]);
+
+$autoConversion = $autoConversionServiceV2->createAutoConversion([
+    'fromAmount' => '100.00',
+    'fromCurrency' => 'USDT',
+    'toCurrency' => 'USDC',
+    'toNetwork' => 'ETH',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'partnerUserID' => 'user123',
+    'partnerPaymentID' => '1234567890'
+]);
+
+echo "Payment ID: " . $autoConversion->getPaymentId();
+echo "Checkout URL: " . $autoConversion->getCheckoutUrl();
+echo "Conversion Rate: " . $autoConversion->getConversionRate();
 ```
 
 ### Error Handling
