@@ -1,6 +1,6 @@
 {
   "name": "chainberry/external-sdk-php",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Chainberry PHP SDK",
   "keywords": [
     "chainberry",
@@ -29,7 +29,8 @@
   },
   "autoload": {
     "psr-4": {
-      "OpenAPI\\Client\\": "lib/"
+      "OpenAPI\\Client\\": "lib/",
+      "OpenAPI\\ClientV1\\": "libV1/"
     }
   },
   "autoload-dev": {
