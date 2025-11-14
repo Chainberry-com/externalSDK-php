@@ -67,7 +67,7 @@ class AutoConversionService
         $fromCurrency = strtoupper($this->resolveFromCurrency($params));
         $toCurrency = strtoupper($this->resolveToCurrency($params));
 
-        $supportedAssets = $this->apiSetup->getAssetApi()->assetControllerGetSupportedAssets();
+        $supportedAssets = $this->apiSetup->getAssetApi()->assetV2ControllerGetSupportedAssetsV2();
         if ($this->findAssetBySymbol($supportedAssets, $fromCurrency) === null) {
             throw new \Exception("From currency {$fromCurrency} is not supported.");
         }

@@ -60,7 +60,7 @@ class DepositService
         }
 
         $currency = strtoupper($params['currency']);
-        $supportedAssets = $this->apiSetup->getAssetApi()->assetControllerGetSupportedAssets();
+        $supportedAssets = $this->apiSetup->getAssetApi()->assetV2ControllerGetSupportedAssetsV2();
         if ($this->findAssetBySymbol($supportedAssets, $currency) === null) {
             throw new \Exception(
                 "Currency {$currency} is not supported. It should be one of the supported assets returned by the Asset API."

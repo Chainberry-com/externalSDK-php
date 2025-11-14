@@ -78,19 +78,19 @@ use OpenAPI\Client\BerrySdk;
 // Initialize the SDK
 BerrySdk::init();
 
-// Create a deposit
+// Create a deposit (V2 models)
 $depositParams = [
     'amount' => '100.00',
     'currency' => 'USDC',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123',
-    'paymentGatewayName' => 'ETH', // Optional
-    'paymentCurrency' => 'USDC'     // Optional
+    'partnerUserID' => 'user123',
+    'network' => 'ETH', // Optional
+    'partnerPaymentID' => '1234567890'
 ];
 
 try {
     $deposit = BerrySdk::createDeposit($depositParams);
-    echo "Deposit created: " . $deposit['paymentId'];
+    echo "Deposit created: " . $deposit->getPaymentId();
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -106,20 +106,20 @@ use OpenAPI\Client\BerrySdk;
 // Initialize the SDK
 BerrySdk::init();
 
-// Create a withdrawal
+// Create a withdrawal (V2 models)
 $withdrawParams = [
     'amount' => '50.00',
     'currency' => 'USDT',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123',
+    'partnerUserID' => 'user123',
     'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6', // Required
-    'paymentGatewayName' => 'USDT', // Optional
-    'withdrawCurrency' => 'USDT'     // Optional
+    'network' => 'TRX',
+    'partnerPaymentID' => '1234567890'
 ];
 
 try {
     $withdraw = BerrySdk::createWithdraw($withdrawParams);
-    echo "Withdrawal created: " . $withdraw['paymentId'];
+    echo "Withdrawal created: " . $withdraw->getPaymentId();
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -140,7 +140,7 @@ $paymentId = 'your_payment_id';
 
 try {
     $deposit = BerrySdk::getDeposit($paymentId);
-    echo "Deposit status: " . $deposit['status'];
+    echo "Deposit status: " . $deposit->getStatus();
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -161,7 +161,7 @@ $paymentId = 'your_payment_id';
 
 try {
     $withdraw = BerrySdk::getWithdraw($paymentId);
-    echo "Withdrawal status: " . $withdraw['status'];
+    echo "Withdrawal status: " . $withdraw->getStatus();
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -177,14 +177,15 @@ use OpenAPI\Client\BerrySdk;
 // Initialize the SDK
 BerrySdk::init();
 
-// Create an auto conversion
+// Create an auto conversion (V2 models)
 $autoConversionParams = [
-    'amount' => '100.00',
-    'currency' => 'USDT',           // Source currency
-    'paymentCurrency' => 'USDC',    // Target currency
+    'fromAmount' => '100.00',
+    'fromCurrency' => 'USDT',
+    'toCurrency' => 'USDC',
+    'toNetwork' => 'ETH',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123',
-    'paymentGatewayName' => 'BNB'   // Optional: payment gateway
+    'partnerUserID' => 'user123',
+    'partnerPaymentID' => '1234567890'
 ];
 
 try {
@@ -192,7 +193,7 @@ try {
     echo "Auto conversion created: " . $autoConversion->getPaymentId();
     echo "Checkout URL: " . $autoConversion->getCheckoutUrl();
     echo "Conversion Rate: " . $autoConversion->getConversionRate();
-    echo "Final Amount: " . $autoConversion->getNetAmount();
+    echo "To Amount: " . $autoConversion->getToAmount();
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -252,7 +253,7 @@ $depositsApi = $apiSetup->getDepositsApi();
 $oauthApi = $apiSetup->getOauthApi();
 
 // Use APIs directly
-$supportedAssets = $assetApi->assetControllerGetSupportedAssets();
+$supportedAssets = $assetApi->assetV2ControllerGetSupportedAssetsV2();
 ```
 
 ### Using the Deposit Service
@@ -273,7 +274,8 @@ $signedRequest = $depositService->getSignedDepositRequest([
     'amount' => '100.00',
     'currency' => 'USDT',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123'
+    'partnerUserID' => 'user123',
+    'network' => 'ETH'
 ]);
 
 // Create deposit
@@ -281,7 +283,8 @@ $deposit = $depositService->createDeposit([
     'amount' => '100.00',
     'currency' => 'USDT',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123'
+    'partnerUserID' => 'user123',
+    'network' => 'ETH'
 ]);
 
 // Get deposit with retry logic
@@ -306,8 +309,9 @@ $signedRequest = $withdrawService->getSignedWithdrawRequest([
     'amount' => '50.00',
     'currency' => 'USDT',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123',
-    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
+    'partnerUserID' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6',
+    'network' => 'TRX'
 ]);
 
 // Create withdrawal
@@ -315,8 +319,9 @@ $withdraw = $withdrawService->createWithdraw([
     'amount' => '50.00',
     'currency' => 'USDT',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123',
-    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
+    'partnerUserID' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6',
+    'network' => 'TRX'
 ]);
 
 // Get withdrawal with retry logic
@@ -338,22 +343,24 @@ $autoConversionService = new AutoConversionService();
 
 // Get signed auto conversion request
 $signedRequest = $autoConversionService->getSignedAutoConversionRequest([
-    'amount' => '100.00',
-    'currency' => 'USDT',           // Source currency
-    'paymentCurrency' => 'USDC',    // Target currency
+    'fromAmount' => '100.00',
+    'fromCurrency' => 'USDT',
+    'toCurrency' => 'USDC',
+    'toNetwork' => 'ETH',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123',
-    'paymentGatewayName' => 'BNB'   // Optional: payment gateway
+    'partnerUserID' => 'user123',
+    'partnerPaymentID' => '1234567890'
 ]);
 
 // Create auto conversion
 $autoConversion = $autoConversionService->createAutoConversion([
-    'amount' => '100.00',
-    'currency' => 'USDT',
-    'paymentCurrency' => 'USDC',
+    'fromAmount' => '100.00',
+    'fromCurrency' => 'USDT',
+    'toCurrency' => 'USDC',
+    'toNetwork' => 'ETH',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123',
-    'paymentGatewayName' => 'BNB'
+    'partnerUserID' => 'user123',
+    'partnerPaymentID' => '1234567890'
 ]);
 
 // Access response properties
@@ -480,11 +487,11 @@ $logger->error('Error occurred', ['error' => $error]);
 - `init(?array $config = null): ApiSetup` - Initialize the SDK
 - `getApi(): ApiSetup` - Get the API setup instance
 - `getLogger(): Logger` - Get the logger instance
-- `createDeposit(array $params): array` - Create a deposit
-- `getDeposit(string $paymentId, int $maxRetries = 2): array` - Get deposit information
-- `createWithdraw(array $params): array` - Create a withdrawal
-- `getWithdraw(string $paymentId, int $maxRetries = 2): array` - Get withdrawal information
-- `createAutoConversion(array $params): AutoConversionResponseDto` - Create an auto conversion
+- `createDeposit(array $params): \OpenAPI\Client\Model\DepositResponseV2Dto` - Create a deposit
+- `getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\PaymentResponseV2Dto` - Get deposit information
+- `createWithdraw(array $params): \OpenAPI\Client\Model\WithdrawResponseV2Dto` - Create a withdrawal
+- `getWithdraw(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\WithdrawV2Dto` - Get withdrawal information
+- `createAutoConversion(array $params): \OpenAPI\Client\Model\AutoConversionResponseV2Dto` - Create an auto conversion
 - `signPayload(array $payload, string $privateKey): array` - Sign a payload
 - `verifySignature(array $dataWithSignature, string $publicKey): bool` - Verify a signature
 - `reset(): void` - Reset the SDK instance
@@ -499,9 +506,9 @@ $logger->error('Error occurred', ['error' => $error]);
 - `ensureAccessToken(): string` - Ensure access token is available
 - `getConfig(): ?ExternalApiConfig` - Get current configuration
 - `getAssetApi(): AssetApi` - Get Asset API instance
+- `getAutoConversionApi(): ConvertApi` - Get Auto Conversion API instance
 - `getDepositsApi(): DepositsApi` - Get Deposits API instance
 - `getWithdrawApi(): WithdrawApi` - Get Withdraw API instance
-- `getAutoConversionApi(): AutoConversionApi` - Get Auto Conversion API instance
 - `getOauthApi(): OauthApi` - Get OAuth API instance
 - `getTestApi(): TestApi` - Get Test API instance
 
@@ -509,45 +516,46 @@ $logger->error('Error occurred', ['error' => $error]);
 
 #### Methods
 
-- `getSignedDepositRequest(array $params): array` - Get signed deposit request
-- `createDeposit(array $params): array` - Create and submit deposit
-- `getDeposit(string $paymentId, int $maxRetries = 2): array` - Get deposit with retry
-- `getDepositWithEnvAuth(string $paymentId, int $maxRetries = 2): array` - Get deposit with env auth
+- `getSignedDepositRequest(array $params): \OpenAPI\Client\Model\DepositRequestV2Dto` - Get signed deposit request
+- `createDeposit(array $params): \OpenAPI\Client\Model\DepositResponseV2Dto` - Create and submit deposit
+- `getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\PaymentResponseV2Dto` - Get deposit with retry
+- `getDepositWithEnvAuth(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\PaymentResponseV2Dto` - Get deposit with env auth
 
 ### WithdrawService Class
 
 #### Methods
 
-- `getSignedWithdrawRequest(array $params): array` - Get signed withdrawal request
-- `createWithdraw(array $params): array` - Create and submit withdrawal
-- `getWithdraw(string $paymentId, int $maxRetries = 2): array` - Get withdrawal with retry
-- `getWithdrawWithEnvAuth(string $paymentId, int $maxRetries = 2): array` - Get withdrawal with env auth
+- `getSignedWithdrawRequest(array $params): \OpenAPI\Client\Model\WithdrawRequestV2Dto` - Get signed withdrawal request
+- `createWithdraw(array $params): \OpenAPI\Client\Model\WithdrawResponseV2Dto` - Create and submit withdrawal
+- `getWithdraw(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\WithdrawV2Dto` - Get withdrawal with retry
+- `getWithdrawWithEnvAuth(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\WithdrawV2Dto` - Get withdrawal with env auth
 
 ### AutoConversionService Class
 
 #### Methods
 
-- `getSignedAutoConversionRequest(array $params): array` - Get signed auto conversion request
-- `createAutoConversion(array $params): AutoConversionResponseDto` - Create and submit auto conversion
+- `getSignedAutoConversionRequest(array $params): \OpenAPI\Client\Model\AutoConversionRequestV2Dto` - Get signed auto conversion request
+- `createAutoConversion(array $params): \OpenAPI\Client\Model\AutoConversionResponseV2Dto` - Create and submit auto conversion
 
-#### Auto Conversion Parameters
+#### Auto Conversion Parameters (V2)
 
-- `amount` (string, required) - Amount to convert
-- `currency` (string, required) - Source currency (BTC, ETH, USDT, USDC, BNB, LTC, TON)
-- `paymentCurrency` (string, required) - Target currency (BTC, ETH, USDT, USDC, BNB, LTC, TON)
+- `fromAmount` (string, required) - Amount to convert from
+- `fromCurrency` (string, required) - Source currency
+- `fromNetwork` (string, optional) - Source network
+- `toCurrency` (string, required) - Target currency
+- `toNetwork` (string, required) - Target network
 - `callbackUrl` (string, required) - Webhook URL for notifications
-- `tradingAccountLogin` (string, required) - Trading account identifier
-- `paymentGatewayName` (string, optional) - Payment gateway name (required for tokens like USDT/USDC)
+- `partnerUserID` (string, required) - Partner user identifier
+- `partnerPaymentID` (string, optional) - Partner payment identifier
 
-#### Auto Conversion Response Properties
+#### Auto Conversion Response Properties (V2)
 
 - `getPaymentId()` - Unique payment identifier
 - `getCheckoutUrl()` - URL for user to complete the conversion
 - `getConversionRate()` - Exchange rate used for conversion
-- `getFinalCurrency()` - Final currency after conversion
-- `getTransactionAmount()` - Original transaction amount
-- `getNetAmount()` - Amount after fees
-- `getProcessingFee()` - Processing fee charged
+- `getFromAmount()` / `getFromCurrency()` - Original amount/currency
+- `getToAmount()` / `getToCurrency()` - Converted amount/currency
+- `getCommissionAmount()` / `getCommissionCurrency()` - Commission details
 
 ### CryptoUtils Class
 

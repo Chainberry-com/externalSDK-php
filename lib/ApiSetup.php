@@ -13,6 +13,8 @@ use OpenAPI\Client\Errors\BadRequestError;
 use OpenAPI\Client\Errors\ConfigurationError;
 use OpenAPI\Client\Errors\NetworkError;
 use OpenAPI\Client\Errors\UnauthorizedError;
+use OpenAPI\Client\Model\InitTestParamsDto;
+use OpenAPI\Client\Model\TokenRequestDto;
 use OpenAPI\Client\Utils\CryptoUtils;
 
 /**
@@ -66,9 +68,9 @@ class ApiSetup
     private ?string $accessToken = null;
 
     private const DEFAULT_BASE_URLS = [
-        Environment::STAGING => 'https://api-stg.chainberry.com/api/v1',
-        Environment::PRODUCTION => 'https://api.chainberry.com/api/v1',
-        Environment::LOCAL => 'http://192.168.0.226:3001/api/v1',
+        Environment::STAGING => 'https://api-stg.chainberry.com/api/v2',
+        Environment::PRODUCTION => 'https://api.chainberry.com/api/v2',
+        Environment::LOCAL => 'http://192.168.0.226:3001/api/v2',
     ];
 
     private const CHAINBERRY_PUBLIC_KEYS = [
@@ -170,11 +172,13 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
             'timestamp' => time(),
         ], $this->config->privateKey);
 
-        $this->testApi->testControllerInitParams([
+        $initParams = new InitTestParamsDto([
             'signature' => $signature['signature'],
-            'apiToken' => $signature['apiToken'],
-            'timestamp' => $signature['timestamp'],
+            'api_token' => $signature['apiToken'],
+            'timestamp' => (float) $signature['timestamp'],
         ]);
+
+        $this->testApi->testV2ControllerInitParamsV2($initParams);
     }
 
     /**
@@ -315,11 +319,13 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
         }
 
         try {
-            $response = $this->oauthApi->oAuthControllerToken([
-                'clientId' => $this->config->clientId,
-                'clientSecret' => $this->config->clientSecret,
-                'grantType' => 'client_credentials',
+            $tokenRequest = new TokenRequestDto([
+                'client_id' => $this->config->clientId,
+                'client_secret' => $this->config->clientSecret,
+                'grant_type' => 'client_credentials',
             ]);
+
+            $response = $this->oauthApi->oAuthV2ControllerTokenV2($tokenRequest);
 
             if ($response && $response->getAccessToken()) {
                 $this->accessToken = $response->getAccessToken();

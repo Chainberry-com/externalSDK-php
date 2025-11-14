@@ -103,19 +103,19 @@ use OpenAPI\Client\BerrySdk;
 // Initialize the SDK
 BerrySdk::init();
 
-// Create a deposit
+// Create a deposit (V2 models)
 $depositParams = [
     'amount' => '100.00',
     'currency' => 'USDC',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123',
-    'paymentGatewayName' => 'ETH', // Optional
-    'paymentCurrency' => 'USDC'     // Optional
+    'partnerUserID' => 'user123',
+    'network' => 'ETH', // Optional
+    'partnerPaymentID' => '1234567890'
 ];
 
 try {
     $deposit = BerrySdk::createDeposit($depositParams);
-    echo "Deposit created: " . $deposit['paymentId'];
+    echo "Deposit created: " . $deposit->getPaymentId();
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -131,20 +131,20 @@ use OpenAPI\Client\BerrySdk;
 // Initialize the SDK
 BerrySdk::init();
 
-// Create a withdrawal
+// Create a withdrawal (V2 models)
 $withdrawParams = [
     'amount' => '50.00',
     'currency' => 'USDT',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123',
+    'partnerUserID' => 'user123',
     'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6', // Required
-    'paymentGatewayName' => 'USDT', // Optional
-    'withdrawCurrency' => 'USDT'     // Optional
+    'network' => 'TRX',
+    'partnerPaymentID' => '1234567890'
 ];
 
 try {
     $withdraw = BerrySdk::createWithdraw($withdrawParams);
-    echo "Withdrawal created: " . $withdraw['paymentId'];
+    echo "Withdrawal created: " . $withdraw->getPaymentId();
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -165,7 +165,7 @@ $paymentId = 'your_payment_id';
 
 try {
     $deposit = BerrySdk::getDeposit($paymentId);
-    echo "Deposit status: " . $deposit['status'];
+    echo "Deposit status: " . $deposit->getStatus();
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -186,7 +186,7 @@ $paymentId = 'your_payment_id';
 
 try {
     $withdraw = BerrySdk::getWithdraw($paymentId);
-    echo "Withdrawal status: " . $withdraw['status'];
+    echo "Withdrawal status: " . $withdraw->getStatus();
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -246,7 +246,7 @@ $depositsApi = $apiSetup->getDepositsApi();
 $oauthApi = $apiSetup->getOauthApi();
 
 // Use APIs directly
-$supportedAssets = $assetApi->assetControllerGetSupportedAssets();
+$supportedAssets = $assetApi->assetV2ControllerGetSupportedAssetsV2();
 ```
 
 ### Using the Deposit Service
@@ -267,7 +267,8 @@ $signedRequest = $depositService->getSignedDepositRequest([
     'amount' => '100.00',
     'currency' => 'USDT',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123'
+    'partnerUserID' => 'user123',
+    'network' => 'ETH'
 ]);
 
 // Create deposit
@@ -275,7 +276,8 @@ $deposit = $depositService->createDeposit([
     'amount' => '100.00',
     'currency' => 'USDT',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123'
+    'partnerUserID' => 'user123',
+    'network' => 'ETH'
 ]);
 
 // Get deposit with retry logic
@@ -300,8 +302,9 @@ $signedRequest = $withdrawService->getSignedWithdrawRequest([
     'amount' => '50.00',
     'currency' => 'USDT',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123',
-    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
+    'partnerUserID' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6',
+    'network' => 'TRX'
 ]);
 
 // Create withdrawal
@@ -309,8 +312,9 @@ $withdraw = $withdrawService->createWithdraw([
     'amount' => '50.00',
     'currency' => 'USDT',
     'callbackUrl' => 'https://your-callback-url.com/webhook',
-    'tradingAccountLogin' => 'user123',
-    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6'
+    'partnerUserID' => 'user123',
+    'address' => '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6',
+    'network' => 'TRX'
 ]);
 
 // Get withdrawal with retry logic
@@ -440,10 +444,10 @@ $apiInstance = new OpenAPI\Client\Api\AssetApi(
 );
 
 try {
-    $result = $apiInstance->assetControllerGetSupportedAssets();
+    $result = $apiInstance->assetV2ControllerGetSupportedAssetsV2();
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling AssetApi->assetControllerGetSupportedAssets: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling AssetApi->assetV2ControllerGetSupportedAssetsV2: ', $e->getMessage(), PHP_EOL;
 }
 
 ```
@@ -454,8 +458,8 @@ All URIs are relative to _http://localhost:3001/api/v1_
 
 | Class               | Method                                                                                                                         | HTTP request                              | Description                                                                                           |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| _AssetApi_          | [**assetControllerGetSupportedAssets**](docs/Api/AssetApi.md#assetcontrollergetsupportedassets)                                | **GET** /asset                            |
-| _AutoConversionApi_ | [**autoConversionControllerAutoConversion**](docs/Api/AutoConversionApi.md#autoconversioncontrollerautoconversion)             | **POST** /auto-conversion                 |
+| _AssetApi_          | [**assetV2ControllerGetSupportedAssetsV2**](docs/Api/AssetApi.md#assetv2controllergetsupportedassetsv2)                        | **GET** /asset                            |
+| _ConvertApi_        | [**autoConversionV2ControllerAutoConversionV2**](docs/Api/ConvertApi.md#autoconversionv2controllerautoconversionv2)             | **POST** /convert                         |
 | _BinanceApi_        | [**binanceControllerExecuteTradingWorkflow**](docs/Api/BinanceApi.md#binancecontrollerexecutetradingworkflow)                  | **POST** /binance/workflow/execute        |
 | _BinanceApi_        | [**binanceControllerGetAveragePrice**](docs/Api/BinanceApi.md#binancecontrollergetaverageprice)                                | **GET** /binance/average-price/{symbol}   |
 | _BinanceApi_        | [**binanceControllerGetAveragePrices**](docs/Api/BinanceApi.md#binancecontrollergetaverageprices)                              | **GET** /binance/average-prices           |
@@ -463,32 +467,32 @@ All URIs are relative to _http://localhost:3001/api/v1_
 | _BinanceApi_        | [**binanceControllerGetWithdrawFee**](docs/Api/BinanceApi.md#binancecontrollergetwithdrawfee)                                  | **GET** /binance/withdraw-fee/{currency}  |
 | _BinanceApi_        | [**binanceControllerValidateSymbol**](docs/Api/BinanceApi.md#binancecontrollervalidatesymbol)                                  | **GET** /binance/validate-symbol/{symbol} |
 | _BinanceApi_        | [**binanceControllerWithdrawToFireblocks**](docs/Api/BinanceApi.md#binancecontrollerwithdrawtofireblocks)                      | **POST** /binance/withdraw                |
-| _DepositsApi_       | [**depositControllerCreateDeposit**](docs/Api/DepositsApi.md#depositcontrollercreatedeposit)                                   | **POST** /deposits                        |
-| _DepositsApi_       | [**depositControllerGetDeposit**](docs/Api/DepositsApi.md#depositcontrollergetdeposit)                                         | **GET** /deposits/{paymentId}             |
-| _DepositsApi_       | [**depositControllerGetDepositPayment**](docs/Api/DepositsApi.md#depositcontrollergetdepositpayment)                           | **GET** /deposits/payments/{paymentId}    |
+| _DepositsApi_       | [**depositV2ControllerCreateDepositV2**](docs/Api/DepositsApi.md#depositv2controllercreatedepositv2)                           | **POST** /deposits                        |
+| _DepositsApi_       | [**depositV2ControllerGetDepositV2**](docs/Api/DepositsApi.md#depositv2controllergetdepositv2)                                 | **GET** /deposits/{paymentId}             |
+| _DepositsApi_       | [**depositV2ControllerGetDepositPaymentV2**](docs/Api/DepositsApi.md#depositv2controllergetdepositpaymentv2)                   | **GET** /deposits/payments/{paymentId}    |
 | _DepositsApi_       | [**depositControllerSetupSupportingAssets**](docs/Api/DepositsApi.md#depositcontrollersetupsupportingassets)                   | **GET** /deposits/setup-supporting-assets |
 | _DepositsApi_       | [**depositControllerSyncUpWithFireblocks**](docs/Api/DepositsApi.md#depositcontrollersyncupwithfireblocks)                     | **GET** /deposits/sync-up-with-fireblocks |
 | _HealthApi_         | [**appControllerHealth**](docs/Api/HealthApi.md#appcontrollerhealth)                                                           | **GET** /health                           | Get the health of the API                                                                             |
 | _KytApi_            | [**kytControllerHandleMonitorNotification**](docs/Api/KytApi.md#kytcontrollerhandlemonitornotification)                        | **POST** /kyt                             | Process KYT monitor notification                                                                      |
-| _OauthApi_          | [**oAuthControllerToken**](docs/Api/OauthApi.md#oauthcontrollertoken)                                                          | **POST** /oauth/token                     |
+| _OauthApi_          | [**oAuthV2ControllerTokenV2**](docs/Api/OauthApi.md#oauthv2controllertokenv2)                                                  | **POST** /oauth/token                     |
 | _PartnersApi_       | [**partnerControllerGetCurrentPartner**](docs/Api/PartnersApi.md#partnercontrollergetcurrentpartner)                           | **GET** /partners/me                      |
 | _PublicKeyApi_      | [**publicKeyControllerDownloadPublicKey**](docs/Api/PublicKeyApi.md#publickeycontrollerdownloadpublickey)                      | **GET** /public-key                       |
 | _SideshiftApi_      | [**sideShiftControllerCreateVariableShift**](docs/Api/SideshiftApi.md#sideshiftcontrollercreatevariableshift)                  | **POST** /sideshift/shifts/variable       |
 | _SideshiftApi_      | [**sideShiftControllerGetPair**](docs/Api/SideshiftApi.md#sideshiftcontrollergetpair)                                          | **GET** /sideshift/pair/{from}/{to}       |
 | _SideshiftApi_      | [**sideShiftControllerGetShift**](docs/Api/SideshiftApi.md#sideshiftcontrollergetshift)                                        | **GET** /sideshift/shifts/{shiftId}       |
-| _TestApi_           | [**testControllerInitParams**](docs/Api/TestApi.md#testcontrollerinitparams)                                                   | **POST** /test/init-params                | Test the init params with JWT token and apiToken                                                      |
+| _TestApi_           | [**testV2ControllerInitParamsV2**](docs/Api/TestApi.md#testv2controllerinitparamsv2)                                           | **POST** /test/init-params                | Test the init params with JWT token and apiToken                                                      |
 | _TestApi_           | [**testControllerTestCallback**](docs/Api/TestApi.md#testcontrollertestcallback)                                               | **POST** /test/callback                   |
 | _TestApi_           | [**testControllerTestJwt**](docs/Api/TestApi.md#testcontrollertestjwt)                                                         | **GET** /test/jwt                         | Test the API with JWT token                                                                           |
 | _TestApi_           | [**testControllerTestSignatureGeneration**](docs/Api/TestApi.md#testcontrollertestsignaturegeneration)                         | **POST** /test/signature-generation       | Test the API with signature generation                                                                |
 | _TestApi_           | [**testControllerTestSignatureVerificationMiddleware**](docs/Api/TestApi.md#testcontrollertestsignatureverificationmiddleware) | **POST** /test/signature-verification     | Test the API with signature verification middleware. Requires apiToken in body. ApiToken is partnerId |
 | _WebhookApi_        | [**webhookControllerHandleWebhook**](docs/Api/WebhookApi.md#webhookcontrollerhandlewebhook)                                    | **POST** /webhook                         |
-| _WithdrawApi_       | [**withdrawControllerCreateWithdraw**](docs/Api/WithdrawApi.md#withdrawcontrollercreatewithdraw)                               | **POST** /withdraw                        |
-| _WithdrawApi_       | [**withdrawControllerGetWithdraw**](docs/Api/WithdrawApi.md#withdrawcontrollergetwithdraw)                                     | **GET** /withdraw/{paymentId}             |
+| _WithdrawApi_       | [**withdrawV2ControllerCreateWithdrawV2**](docs/Api/WithdrawApi.md#withdrawv2controllercreatewithdrawv2)                       | **POST** /withdraw                        |
+| _WithdrawApi_       | [**withdrawV2ControllerGetWithdrawV2**](docs/Api/WithdrawApi.md#withdrawv2controllergetwithdrawv2)                             | **GET** /withdraw/{paymentId}             |
 
 ## Models
 
-- [AutoConversionRequestDto](docs/Model/AutoConversionRequestDto.md)
-- [AutoConversionResponseDto](docs/Model/AutoConversionResponseDto.md)
+- [AutoConversionRequestV2Dto](docs/Model/AutoConversionRequestV2Dto.md)
+- [AutoConversionResponseV2Dto](docs/Model/AutoConversionResponseV2Dto.md)
 - [BinanceControllerGetAveragePrice200Response](docs/Model/BinanceControllerGetAveragePrice200Response.md)
 - [BinanceControllerGetWithdrawFee200Response](docs/Model/BinanceControllerGetWithdrawFee200Response.md)
 - [BinanceControllerValidateSymbol200Response](docs/Model/BinanceControllerValidateSymbol200Response.md)
@@ -497,13 +501,14 @@ All URIs are relative to _http://localhost:3001/api/v1_
 - [BinanceWithdrawResponseDto](docs/Model/BinanceWithdrawResponseDto.md)
 - [BinanceWorkflowConfigDto](docs/Model/BinanceWorkflowConfigDto.md)
 - [BinanceWorkflowResponseDto](docs/Model/BinanceWorkflowResponseDto.md)
-- [DepositDto](docs/Model/DepositDto.md)
-- [DepositRequest](docs/Model/DepositRequest.md)
-- [GetDepositDto](docs/Model/GetDepositDto.md)
-- [GetDepositDtoCryptoTransactionInfoInner](docs/Model/GetDepositDtoCryptoTransactionInfoInner.md)
-- [GetDepositPaymentDto](docs/Model/GetDepositPaymentDto.md)
-- [GetDepositPaymentDtoCryptoTransactionInfoInner](docs/Model/GetDepositPaymentDtoCryptoTransactionInfoInner.md)
-- [GetWithdrawDto](docs/Model/GetWithdrawDto.md)
+- [DepositRequestV2Dto](docs/Model/DepositRequestV2Dto.md)
+- [DepositResponseV2Dto](docs/Model/DepositResponseV2Dto.md)
+- [PaymentResponseV2Dto](docs/Model/PaymentResponseV2Dto.md)
+- [PaymentResponseV2DtoCryptoTransactionInfoInner](docs/Model/PaymentResponseV2DtoCryptoTransactionInfoInner.md)
+- [WithdrawRequestV2Dto](docs/Model/WithdrawRequestV2Dto.md)
+- [WithdrawResponseV2Dto](docs/Model/WithdrawResponseV2Dto.md)
+- [WithdrawV2Dto](docs/Model/WithdrawV2Dto.md)
+- [WithdrawV2DtoCryptoTransactionInfoInner](docs/Model/WithdrawV2DtoCryptoTransactionInfoInner.md)
 - [InitTestParamsDto](docs/Model/InitTestParamsDto.md)
 - [KytMonitorNotificationDto](docs/Model/KytMonitorNotificationDto.md)
 - [PartnerDto](docs/Model/PartnerDto.md)
@@ -516,8 +521,6 @@ All URIs are relative to _http://localhost:3001/api/v1_
 - [SupportedAssetDto](docs/Model/SupportedAssetDto.md)
 - [TokenRequestDto](docs/Model/TokenRequestDto.md)
 - [TokenResponseDto](docs/Model/TokenResponseDto.md)
-- [WithdrawDto](docs/Model/WithdrawDto.md)
-- [WithdrawRequest](docs/Model/WithdrawRequest.md)
 
 ## API Reference
 
@@ -528,10 +531,10 @@ All URIs are relative to _http://localhost:3001/api/v1_
 - `init(?array $config = null): ApiSetup` - Initialize the SDK
 - `getApi(): ApiSetup` - Get the API setup instance
 - `getLogger(): Logger` - Get the logger instance
-- `createDeposit(array $params): array` - Create a deposit
-- `getDeposit(string $paymentId, int $maxRetries = 2): array` - Get deposit information
-- `createWithdraw(array $params): array` - Create a withdrawal
-- `getWithdraw(string $paymentId, int $maxRetries = 2): array` - Get withdrawal information
+- `createDeposit(array $params): \OpenAPI\Client\Model\DepositResponseV2Dto` - Create a deposit
+- `getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\PaymentResponseV2Dto` - Get deposit information
+- `createWithdraw(array $params): \OpenAPI\Client\Model\WithdrawResponseV2Dto` - Create a withdrawal
+- `getWithdraw(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\WithdrawV2Dto` - Get withdrawal information
 - `signPayload(array $payload, string $privateKey): array` - Sign a payload
 - `verifySignature(array $dataWithSignature, string $publicKey): bool` - Verify a signature
 - `reset(): void` - Reset the SDK instance
@@ -546,6 +549,7 @@ All URIs are relative to _http://localhost:3001/api/v1_
 - `ensureAccessToken(): string` - Ensure access token is available
 - `getConfig(): ?ExternalApiConfig` - Get current configuration
 - `getAssetApi(): AssetApi` - Get Asset API instance
+- `getAutoConversionApi(): ConvertApi` - Get Auto Conversion API instance
 - `getDepositsApi(): DepositsApi` - Get Deposits API instance
 - `getWithdrawApi(): WithdrawApi` - Get Withdraw API instance
 - `getOauthApi(): OauthApi` - Get OAuth API instance
@@ -555,19 +559,19 @@ All URIs are relative to _http://localhost:3001/api/v1_
 
 #### Methods
 
-- `getSignedDepositRequest(array $params): array` - Get signed deposit request
-- `createDeposit(array $params): array` - Create and submit deposit
-- `getDeposit(string $paymentId, int $maxRetries = 2): array` - Get deposit with retry
-- `getDepositWithEnvAuth(string $paymentId, int $maxRetries = 2): array` - Get deposit with env auth
+- `getSignedDepositRequest(array $params): \OpenAPI\Client\Model\DepositRequestV2Dto` - Get signed deposit request
+- `createDeposit(array $params): \OpenAPI\Client\Model\DepositResponseV2Dto` - Create and submit deposit
+- `getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\PaymentResponseV2Dto` - Get deposit with retry
+- `getDepositWithEnvAuth(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\PaymentResponseV2Dto` - Get deposit with env auth
 
 ### WithdrawService Class
 
 #### Methods
 
-- `getSignedWithdrawRequest(array $params): array` - Get signed withdrawal request
-- `createWithdraw(array $params): array` - Create and submit withdrawal
-- `getWithdraw(string $paymentId, int $maxRetries = 2): array` - Get withdrawal with retry
-- `getWithdrawWithEnvAuth(string $paymentId, int $maxRetries = 2): array` - Get withdrawal with env auth
+- `getSignedWithdrawRequest(array $params): \OpenAPI\Client\Model\WithdrawRequestV2Dto` - Get signed withdrawal request
+- `createWithdraw(array $params): \OpenAPI\Client\Model\WithdrawResponseV2Dto` - Create and submit withdrawal
+- `getWithdraw(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\WithdrawV2Dto` - Get withdrawal with retry
+- `getWithdrawWithEnvAuth(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\WithdrawV2Dto` - Get withdrawal with env auth
 
 ### CryptoUtils Class
 
