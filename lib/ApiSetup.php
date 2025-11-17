@@ -21,14 +21,13 @@ use OpenAPI\Client\Utils\CryptoUtils;
 use OpenAPI\ClientV1\Api\AutoConversionApi;
 use OpenAPI\ClientV1\Configuration;
 
+const DEFAULT_API_VERSION = 'v1';
+
 /**
  * Environment enum
  */
 class Environment
 {
-    public const STAGING_V2 = 'staging_v2';
-    public const PRODUCTION_V2 = 'production_v2';
-    public const LOCAL_V2 = 'local_v2';
     public const STAGING = 'staging';
     public const PRODUCTION = 'production';
     public const LOCAL = 'local';
@@ -56,6 +55,7 @@ class ExternalApiConfig
     public ?string $clientSecret = null;
     public ?string $privateKey = null;
     public ?string $chainberryPublicKey = null;
+    public string $apiVersion = DEFAULT_API_VERSION; // default to v1
 }
 
 /**
@@ -79,12 +79,18 @@ class ApiSetup
     private ?WithdrawApi $withdrawApi = null;
 
     private const DEFAULT_BASE_URLS = [
-        Environment::STAGING => 'https://api-stg.chainberry.com/api/v1',
-        Environment::PRODUCTION => 'https://api.chainberry.com/api/v1',
-        Environment::LOCAL => 'http://192.168.0.226:3001/api/v1',
-        Environment::STAGING_V2 => 'https://api-stg.chainberry.com/api/v2',
-        Environment::PRODUCTION_V2 => 'https://api.chainberry.com/api/v2',
-        Environment::LOCAL_V2 => 'http://192.168.0.226:3001/api/v2',
+        Environment::STAGING => [
+            'v1' => 'https://api-stg.chainberry.com/api/v1',
+            'v2' => 'https://api-stg.chainberry.com/api/v2',
+        ],
+        Environment::PRODUCTION => [
+            'v1' => 'https://api.chainberry.com/api/v1',
+            'v2' => 'https://api.chainberry.com/api/v2',
+        ],
+        Environment::LOCAL => [
+            'v1' => 'http://192.168.0.226:3001/api/v1',
+            'v2' => 'http://192.168.0.226:3001/api/v2',
+        ],
     ];
 
     private const CHAINBERRY_PUBLIC_KEYS = [
@@ -107,33 +113,6 @@ keEKz/U+LCYEW27a3AfFzs0d1D/zIxCEBCft/EwhMHqM+fnSSk/DdxFt63m789IO
 BwIDAQAB
 -----END PUBLIC KEY-----",
         Environment::LOCAL => "-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwvCN/n7etTqjNJ0M0JmU
-cGPaXoc6ttN8f3KT02ZV8CpGOV3ekUIwgvXw6mCq4jz2mmGkfnjneuWbWMru3w4I
-6xngWdMeJqcVoOviTPn9wuASnsAu4imMxOxRoyLNDqstOg1g0N4wISaCazmCwJXW
-LwavgC++lnO/iVXHVln5+DDCSSICkII6RGeYoXMev/SvvV1FoQ7tnC6Z069Uh+Uy
-5NYHZrQ/lVIoq9fi0WLrhMzDWYR5ncDjeKntmMb2B2h7Prs3/RXx7bvV1BzSBkE9
-nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
-0QIDAQAB
------END PUBLIC KEY-----",
-        Environment::STAGING_V2 => "-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu9hu+/AZCRVnf3dapRJX
-fZEGaIO7vm8OBHhGNW+2T9ZKHYJw5Mid2V5IQ3TSyVMr8GfSiaxK94z7mGXFKfkt
-3mQE0MLN8lwTGWC7RdtswUoCB91KNP4vhq06VGLC6F+TlcNoIk4F2o30JwZgixDy
-FHUpPXuUTvKte63ur+Na/+yBDsWFPGaxGPNMYKoSaOnJK1cmNj2sr8SqfsNK9LAx
-BAWPWFPwzfiIjwOk1udbeMuQ07uRJWwrLevZ7OuMxZvYees/Wg5+25R1OzOY/jis
-StNgGTv7bEwE54thP8F+tAeDy8eYhUuotvo+vlpivH49wWN6W3+9gaRskVhrRhEs
-0QIDAQAB
------END PUBLIC KEY-----",
-        Environment::PRODUCTION_V2 => "-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoxUR0G/8yIIkLWAivkgd
-2pMzGyk39uR4O/ZdqJ3vUSsmUBoAHpahzyfn/hT/pZC8/13KA1heB5LdTU91LzWg
-667nqd3fFgUx8g4b9BuOWEpBl/VNIbIj/nfU0QxW8s/KSJ8pmIeuYgCqhYiaCpLD
-2dpfbf7kMlzXci3kApqTMXiJTO5XHlGhhXpKggHwRIIglsK/lTxnw0MuskywV5gf
-V2sj6YxNpGQ+uaY3aO6yTGRU0ZBTrHfxJlsRSeiaTXxX9QhRUPjQRAk5OuLrF5kO
-keEKz/U+LCYEW27a3AfFzs0d1D/zIxCEBCft/EwhMHqM+fnSSk/DdxFt63m789IO
-BwIDAQAB
------END PUBLIC KEY-----",
-        Environment::LOCAL_V2 => "-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwvCN/n7etTqjNJ0M0JmU
 cGPaXoc6ttN8f3KT02ZV8CpGOV3ekUIwgvXw6mCq4jz2mmGkfnjneuWbWMru3w4I
 6xngWdMeJqcVoOviTPn9wuASnsAu4imMxOxRoyLNDqstOg1g0N4wISaCazmCwJXW
@@ -240,10 +219,14 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
     {
         $envConfig = $this->getConfigFromEnv();
         $environment = $config['environment'] ?? $envConfig->environment;
+        $apiVersion = $config['apiVersion'] ?? $envConfig->apiVersion;
+        if (!in_array($apiVersion, ['v1', 'v2'])) {
+            throw new BadRequestError("Invalid API version. Should be v1 or v2. Please provide either in the config parameter 'apiVersion' or as environment variable CB_API_API_VERSION.");
+        }
 
         $finalConfig = new ExternalApiConfig();
         $finalConfig->environment = $environment;
-        $finalConfig->baseUrl = $this->getBaseUrl($environment);
+        $finalConfig->baseUrl = $this->getBaseUrl($environment, $apiVersion);
         $finalConfig->clientId = $config['clientId'] ?? $envConfig->clientId;
         $finalConfig->clientSecret = $config['clientSecret'] ?? $envConfig->clientSecret;
         $finalConfig->privateKey = $config['privateKey'] ?? $envConfig->privateKey;
@@ -276,14 +259,15 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
      * Get default base URL based on environment
      * 
      * @param string|null $environment Environment
+     * @param string $apiVersion API version (defaults to 'v1')
      * @return string|null Base URL
      */
-    private function getBaseUrl(?string $environment): ?string
+    private function getBaseUrl(?string $environment, string $apiVersion = DEFAULT_API_VERSION): ?string
     {
         if (empty($environment)) {
             return null;
         }
-        return self::DEFAULT_BASE_URLS[$environment] ?? null;
+        return self::DEFAULT_BASE_URLS[$environment][$apiVersion] ?? null;
     }
 
     /**
@@ -311,6 +295,8 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
         $envEnvironment = getenv('CB_API_ENVIRONMENT');
 
         $config->environment = $envEnvironment ? $this->parseEnvironment($envEnvironment) : null;
+        $envApiVersion = getenv('CB_API_VERSION');
+        $config->apiVersion = ($envApiVersion !== false) ? $envApiVersion : $config->apiVersion;
         $config->clientId = getenv('CB_API_CLIENT_ID');
         $config->clientSecret = getenv('CB_API_CLIENT_SECRET');
         $privateKey = getenv('CB_API_PRIVATE_KEY');
@@ -341,15 +327,6 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
         }
         if (in_array($normalized, ['local'])) {
             return Environment::LOCAL;
-        }
-        if (in_array($normalized, ['staging_v2', 'dev_v2', 'development_v2'])) {
-            return Environment::STAGING_V2;
-        }
-        if (in_array($normalized, ['production_v2', 'prod_v2'])) {
-            return Environment::PRODUCTION_V2;
-        }
-        if (in_array($normalized, ['local_v2'])) {
-            return Environment::LOCAL_V2;
         }
         return null;
     }
