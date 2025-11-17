@@ -32,7 +32,8 @@ composer install
 Set the following environment variables:
 
 ```bash
-export CB_API_ENVIRONMENT=staging  # or production
+export CB_API_ENVIRONMENT=staging  # or production, local
+export CB_API_VERSION=v2  # or v1 (defaults to v1 if not set)
 export CB_API_CLIENT_ID=your_client_id
 export CB_API_CLIENT_SECRET=your_client_secret
 export CB_API_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
@@ -44,27 +45,32 @@ Alternatively, you can pass configuration directly:
 
 ```php
 $config = [
-    'environment' => 'staging', // or 'production'
+    'environment' => 'staging', // or 'production', 'local'
+    'apiVersion' => 'v2', // or 'v1' (defaults to 'v1' if not set)
     'clientId' => 'your_client_id',
     'clientSecret' => 'your_client_secret',
     'privateKey' => '-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'
 ];
 ```
 
-## Choosing an Environment (V1 vs V2)
+## Choosing an Environment and API Version (V1 vs V2)
 
-Set `CB_API_ENVIRONMENT` (or the `$config['environment']` value) to match the API version you want to call. Both generations can coexist in the same project—just initialize once with the environment that matches the endpoints you plan to hit.
+The SDK uses two separate configuration values:
+- **Environment** (`CB_API_ENVIRONMENT` or `$config['environment']`): The deployment environment (staging, production, or local)
+- **API Version** (`CB_API_VERSION` or `$config['apiVersion']`): The API version to use (v1 or v2)
 
-| Value          | `Environment::*` constant | API version | Base URL                                       | When to use                                               |
-| -------------- | ------------------------- | ----------- | ---------------------------------------------- | --------------------------------------------------------- |
-| `staging`      | `Environment::STAGING`    | V1          | `https://api-stg.chainberry.com/api/v1`        | Legacy flows against the staging cluster                  |
-| `production`   | `Environment::PRODUCTION` | V1          | `https://api.chainberry.com/api/v1`            | Legacy flows in production                                |
-| `local`        | `Environment::LOCAL`      | V1          | `http://192.168.0.226:3001/api/v1`             | Self-hosted/local API gateway                             |
-| `staging_v2`   | `Environment::STAGING_V2` | V2          | `https://api-stg.chainberry.com/api/v2`        | New V2 endpoints in staging                               |
-| `production_v2`| `Environment::PRODUCTION_V2`| V2        | `https://api.chainberry.com/api/v2`            | New V2 endpoints in production                            |
-| `local_v2`     | `Environment::LOCAL_V2`   | V2          | `http://192.168.0.226:3001/api/v2`             | Local development targeting V2 routes                     |
+Both values are combined to determine the base URL. The API version defaults to `v1` if not specified.
 
-**Tip:** You can call both V1 and V2 helper methods from the same process. Just make sure the environment you initialize with matches the endpoints you want to invoke. For example, if you call `BerrySdk::createWithdrawV2()` while the SDK is initialized with `Environment::STAGING`, the V2 HTTP client will still try to call `/api/v2` on a V1 hostname and authentication will fail.
+| Environment   | `Environment::*` constant | API Version | Base URL                                       | When to use                                               |
+| ------------- | ------------------------- | ----------- | ---------------------------------------------- | --------------------------------------------------------- |
+| `staging`     | `Environment::STAGING`    | `v1`        | `https://api-stg.chainberry.com/api/v1`        | Legacy flows against the staging cluster                  |
+| `staging`     | `Environment::STAGING`    | `v2`        | `https://api-stg.chainberry.com/api/v2`        | New V2 endpoints in staging                               |
+| `production`  | `Environment::PRODUCTION`  | `v1`        | `https://api.chainberry.com/api/v1`            | Legacy flows in production                                |
+| `production`  | `Environment::PRODUCTION`  | `v2`        | `https://api.chainberry.com/api/v2`            | New V2 endpoints in production                            |
+| `local`       | `Environment::LOCAL`       | `v1`        | `http://192.168.0.226:3001/api/v1`             | Self-hosted/local API gateway (V1)                        |
+| `local`       | `Environment::LOCAL`       | `v2`        | `http://192.168.0.226:3001/api/v2`             | Local development targeting V2 routes                     |
+
+**Tip:** You can call both V1 and V2 helper methods from the same process, but make sure the `CB_API_VERSION` (or `$config['apiVersion']`) matches the endpoints you want to invoke. For example, if you call `BerrySdk::createWithdrawV2()` while the SDK is initialized with `apiVersion => 'v1'`, the V2 HTTP client will still try to call `/api/v2` on a V1 hostname and authentication will fail.
 
 ## Quick Start
 
@@ -86,7 +92,7 @@ BerrySdk::init($config);
 
 ### V2 Workflow Examples
 
-> Make sure `CB_API_ENVIRONMENT` (or `$config['environment']`) ends with `_v2` before calling these helpers.
+> Make sure `CB_API_VERSION` (or `$config['apiVersion']`) is set to `v2` before calling these helpers.
 
 #### Create a Deposit (V2)
 
@@ -188,7 +194,7 @@ echo "Auto conversion created: " . $autoConversion->getPaymentId();
 
 ### V1 Workflow Examples (Legacy)
 
-> Use `staging`, `production`, or `local` for `CB_API_ENVIRONMENT` when calling the legacy helpers below. These are still fully supported for partners that have not migrated to the V2 contracts yet.
+> Set `CB_API_VERSION` to `v1` (or omit it, as `v1` is the default) when calling the legacy helpers below. These are still fully supported for partners that have not migrated to the V2 contracts yet.
 
 #### Create a Deposit (V1)
 
@@ -323,6 +329,7 @@ $apiSetup = ApiSetup::getInstance();
 // Initialize with configuration
 $apiSetup->init([
     'environment' => Environment::STAGING,
+    'apiVersion' => 'v2', // or 'v1'
     'clientId' => 'your_client_id',
     'clientSecret' => 'your_client_secret',
     'privateKey' => 'your_private_key'
