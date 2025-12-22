@@ -88,8 +88,8 @@ class ApiSetup
             'v2' => 'https://api.chainberry.com/api/v2',
         ],
         Environment::LOCAL => [
-            'v1' => 'http://192.168.0.226:3001/api/v1',
-            'v2' => 'http://192.168.0.226:3001/api/v2',
+            'v1' => 'http://172.17.0.1:3001/api/v1',
+            'v2' => 'http://172.17.0.1:3001/api/v2',
         ],
     ];
 
