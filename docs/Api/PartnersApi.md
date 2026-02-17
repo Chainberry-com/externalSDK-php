@@ -1,16 +1,18 @@
 # OpenAPI\Client\PartnersApi
 
-All URIs are relative to http://localhost:3001/api/v1, except if the operation defines another base path.
+
+
+All URIs are relative to http://0.0.0.0:3001/api/v2, except if the operation defines another base path.
 
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
-| [**partnerControllerGetCurrentPartner()**](PartnersApi.md#partnerControllerGetCurrentPartner) | **GET** /partners/me |  |
+| [**partnerV2ControllerGetSettingsV2()**](PartnersApi.md#partnerV2ControllerGetSettingsV2) | **GET** /partners/settings/{partnerId} |  |
 
 
-## `partnerControllerGetCurrentPartner()`
+## `partnerV2ControllerGetSettingsV2()`
 
 ```php
-partnerControllerGetCurrentPartner(): \OpenAPI\Client\Model\PartnerDto
+partnerV2ControllerGetSettingsV2($partner_id): \OpenAPI\Client\Model\SettingsResponseV2Dto
 ```
 
 
@@ -28,22 +30,25 @@ $apiInstance = new OpenAPI\Client\Api\PartnersApi(
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client()
 );
+$partner_id = 'partner_id_example'; // string
 
 try {
-    $result = $apiInstance->partnerControllerGetCurrentPartner();
+    $result = $apiInstance->partnerV2ControllerGetSettingsV2($partner_id);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling PartnersApi->partnerControllerGetCurrentPartner: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling PartnersApi->partnerV2ControllerGetSettingsV2: ', $e->getMessage(), PHP_EOL;
 }
 ```
 
 ### Parameters
 
-This endpoint does not need any parameter.
+| Name | Type | Description  | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| **partner_id** | **string**|  | |
 
 ### Return type
 
-[**\OpenAPI\Client\Model\PartnerDto**](../Model/PartnerDto.md)
+[**\OpenAPI\Client\Model\SettingsResponseV2Dto**](../Model/SettingsResponseV2Dto.md)
 
 ### Authorization
 
