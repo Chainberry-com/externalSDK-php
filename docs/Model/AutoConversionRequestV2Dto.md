@@ -4,12 +4,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**callback_url** | **string** |  |
+**callback_url** | **string** |  | [optional]
 **api_token** | **string** |  |
 **timestamp** | **float** |  |
 **signature** | **string** |  |
 **partner_payment_id** | **string** |  | [optional]
-**partner_user_id** | **string** |  |
+**partner_user_id** | **string** |  | [optional]
 **from_amount** | **string** | The amount to convert |
 **from_currency** | **string** | The currency to convert from |
 **from_network** | **string** | The network to convert from | [optional]
