@@ -9,6 +9,7 @@ use OpenAPI\Client\Utils\Logger;
 use OpenAPI\Client\Utils\CryptoUtils;
 use OpenAPI\Client\Errors\ConfigurationError;
 use OpenAPI\Client\Services\AutoConversionServiceV2;
+use OpenAPI\Client\Services\CheckoutServiceV2;
 use OpenAPI\Client\Services\DepositServiceV2;
 use OpenAPI\Client\Services\WithdrawServiceV2;
 
@@ -152,6 +153,64 @@ class BerrySdk
     {
         $depositService = new DepositServiceV2();
         return $depositService->createDeposit($params);
+    }
+
+    /**
+     * Create a checkout
+     *
+     * @param array $params Checkout parameters
+     * @return \OpenAPI\Client\Model\CheckoutResponseV2Dto Checkout response
+     * @throws BadRequestError
+     * @throws UnauthorizedError
+     */
+    public static function createCheckoutV2(array $params): \OpenAPI\Client\Model\CheckoutResponseV2Dto
+    {
+        $checkoutService = new CheckoutServiceV2();
+        return $checkoutService->createCheckout($params);
+    }
+
+    /**
+     * Updates a checkout
+     *
+     * @param array $params Checkout update parameters
+     * @return \OpenAPI\Client\Model\CheckoutResponseV2Dto Checkout response
+     * @throws BadRequestError
+     * @throws UnauthorizedError
+     */
+    public static function updateCheckoutV2(array $params): \OpenAPI\Client\Model\CheckoutResponseV2Dto
+    {
+        $checkoutService = new CheckoutServiceV2();
+        return $checkoutService->updateCheckout($params);
+    }
+
+    /**
+     * Get checkout information
+     *
+     * @param string $checkoutId Checkout ID
+     * @param int $maxRetries Maximum retry attempts
+     * @return \OpenAPI\Client\Model\CheckoutResponseV2Dto Checkout information
+     * @throws BadRequestError
+     * @throws UnauthorizedError
+     */
+    public static function getCheckoutV2(string $checkoutId, int $maxRetries = 2): \OpenAPI\Client\Model\CheckoutResponseV2Dto
+    {
+        $checkoutService = new CheckoutServiceV2();
+        return $checkoutService->getCheckout($checkoutId, $maxRetries);
+    }
+
+    /**
+     * Get checkout payment information
+     *
+     * @param string $checkoutId Checkout ID
+     * @param int $maxRetries Maximum retry attempts
+     * @return \OpenAPI\Client\Model\CheckoutPaymentResponseV2Dto Checkout payment information
+     * @throws BadRequestError
+     * @throws UnauthorizedError
+     */
+    public static function getCheckoutPaymentV2(string $checkoutId, int $maxRetries = 2): \OpenAPI\Client\Model\CheckoutPaymentResponseV2Dto
+    {
+        $checkoutService = new CheckoutServiceV2();
+        return $checkoutService->getCheckoutPayment($checkoutId, $maxRetries);
     }
 
     /**
