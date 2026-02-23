@@ -1,6 +1,6 @@
 <?php
 /**
- * SubscribeResponseDto
+ * PartnerResponseV2Dto
  *
  * PHP version 8.1
  *
@@ -32,7 +32,7 @@ use \ArrayAccess;
 use \OpenAPI\Client\ObjectSerializer;
 
 /**
- * SubscribeResponseDto Class Doc Comment
+ * PartnerResponseV2Dto Class Doc Comment
  *
  * @category Class
  * @package  OpenAPI\Client
@@ -40,7 +40,7 @@ use \OpenAPI\Client\ObjectSerializer;
  * @link     https://openapi-generator.tech
  * @implements \ArrayAccess<string, mixed>
  */
-class SubscribeResponseDto implements ModelInterface, ArrayAccess, \JsonSerializable
+class PartnerResponseV2Dto implements ModelInterface, ArrayAccess, \JsonSerializable
 {
     public const DISCRIMINATOR = null;
 
@@ -49,7 +49,7 @@ class SubscribeResponseDto implements ModelInterface, ArrayAccess, \JsonSerializ
       *
       * @var string
       */
-    protected static $openAPIModelName = 'SubscribeResponseDto';
+    protected static $openAPIModelName = 'PartnerResponseV2Dto';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -57,7 +57,8 @@ class SubscribeResponseDto implements ModelInterface, ArrayAccess, \JsonSerializ
       * @var string[]
       */
     protected static $openAPITypes = [
-        'success' => 'bool'
+        'name' => 'string',
+        'logo' => 'string'
     ];
 
     /**
@@ -68,7 +69,8 @@ class SubscribeResponseDto implements ModelInterface, ArrayAccess, \JsonSerializ
       * @psalm-var array<string, string|null>
       */
     protected static $openAPIFormats = [
-        'success' => null
+        'name' => null,
+        'logo' => null
     ];
 
     /**
@@ -77,7 +79,8 @@ class SubscribeResponseDto implements ModelInterface, ArrayAccess, \JsonSerializ
       * @var boolean[]
       */
     protected static array $openAPINullables = [
-        'success' => false
+        'name' => false,
+        'logo' => false
     ];
 
     /**
@@ -166,7 +169,8 @@ class SubscribeResponseDto implements ModelInterface, ArrayAccess, \JsonSerializ
      * @var string[]
      */
     protected static $attributeMap = [
-        'success' => 'success'
+        'name' => 'name',
+        'logo' => 'logo'
     ];
 
     /**
@@ -175,7 +179,8 @@ class SubscribeResponseDto implements ModelInterface, ArrayAccess, \JsonSerializ
      * @var string[]
      */
     protected static $setters = [
-        'success' => 'setSuccess'
+        'name' => 'setName',
+        'logo' => 'setLogo'
     ];
 
     /**
@@ -184,7 +189,8 @@ class SubscribeResponseDto implements ModelInterface, ArrayAccess, \JsonSerializ
      * @var string[]
      */
     protected static $getters = [
-        'success' => 'getSuccess'
+        'name' => 'getName',
+        'logo' => 'getLogo'
     ];
 
     /**
@@ -244,7 +250,8 @@ class SubscribeResponseDto implements ModelInterface, ArrayAccess, \JsonSerializ
      */
     public function __construct(?array $data = null)
     {
-        $this->setIfExists('success', $data ?? [], null);
+        $this->setIfExists('name', $data ?? [], null);
+        $this->setIfExists('logo', $data ?? [], null);
     }
 
     /**
@@ -274,8 +281,11 @@ class SubscribeResponseDto implements ModelInterface, ArrayAccess, \JsonSerializ
     {
         $invalidProperties = [];
 
-        if ($this->container['success'] === null) {
-            $invalidProperties[] = "'success' can't be null";
+        if ($this->container['name'] === null) {
+            $invalidProperties[] = "'name' can't be null";
+        }
+        if ($this->container['logo'] === null) {
+            $invalidProperties[] = "'logo' can't be null";
         }
         return $invalidProperties;
     }
@@ -293,28 +303,55 @@ class SubscribeResponseDto implements ModelInterface, ArrayAccess, \JsonSerializ
 
 
     /**
-     * Gets success
+     * Gets name
      *
-     * @return bool
+     * @return string
      */
-    public function getSuccess()
+    public function getName()
     {
-        return $this->container['success'];
+        return $this->container['name'];
     }
 
     /**
-     * Sets success
+     * Sets name
      *
-     * @param bool $success Indicates if the subscription was successful
+     * @param string $name name
      *
      * @return self
      */
-    public function setSuccess($success)
+    public function setName($name)
     {
-        if (is_null($success)) {
-            throw new \InvalidArgumentException('non-nullable success cannot be null');
+        if (is_null($name)) {
+            throw new \InvalidArgumentException('non-nullable name cannot be null');
         }
-        $this->container['success'] = $success;
+        $this->container['name'] = $name;
+
+        return $this;
+    }
+
+    /**
+     * Gets logo
+     *
+     * @return string
+     */
+    public function getLogo()
+    {
+        return $this->container['logo'];
+    }
+
+    /**
+     * Sets logo
+     *
+     * @param string $logo logo
+     *
+     * @return self
+     */
+    public function setLogo($logo)
+    {
+        if (is_null($logo)) {
+            throw new \InvalidArgumentException('non-nullable logo cannot be null');
+        }
+        $this->container['logo'] = $logo;
 
         return $this;
     }
