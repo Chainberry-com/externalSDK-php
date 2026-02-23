@@ -121,7 +121,7 @@ class CheckoutServiceV2
         }
 
         $reqParams = [
-            'checkoutID' => $params['checkoutID'],
+            'paymentID' => $params['paymentID'],
             'currency' => $currency,
             'network' => $network,
         ];
@@ -138,24 +138,24 @@ class CheckoutServiceV2
     /**
      * Gets checkout information
      *
-     * @param string $checkoutId Checkout ID
+     * @param string $paymentId Payment ID
      * @return CheckoutResponseV2Dto Checkout information
      * @throws BadRequestError
      * @throws UnauthorizedError
      * @throws \Exception
      */
-    public function getCheckout(string $checkoutId, int $maxRetries = 2): CheckoutResponseV2Dto
+    public function getCheckout(string $paymentId, int $maxRetries = 2): CheckoutResponseV2Dto
     {
         try {
             return $this->apiSetup
                 ->getCheckoutApi()
-                ->checkoutV2ControllerGetCheckoutV2($checkoutId, $maxRetries);
+                ->checkoutV2ControllerGetCheckoutV2($paymentId, $maxRetries);
         } catch (\Exception $error) {
             if ($this->isAuthenticationError($error)) {
                 $this->apiSetup->ensureAccessToken();
                 return $this->apiSetup
                     ->getCheckoutApi()
-                    ->checkoutV2ControllerGetCheckoutV2($checkoutId, $maxRetries);
+                    ->checkoutV2ControllerGetCheckoutV2($paymentId, $maxRetries);
             }
 
             throw $error;
@@ -165,24 +165,24 @@ class CheckoutServiceV2
     /**
      * Gets checkout payment information
      *
-     * @param string $checkoutId Checkout ID
+     * @param string $paymentId Payment ID
      * @return CheckoutPaymentResponseV2Dto Checkout payment information
      * @throws BadRequestError
      * @throws UnauthorizedError
      * @throws \Exception
      */
-    public function getCheckoutPayment(string $checkoutId, int $maxRetries = 2): CheckoutPaymentResponseV2Dto
+    public function getCheckoutPayment(string $paymentId, int $maxRetries = 2): CheckoutPaymentResponseV2Dto
     {
         try {
             return $this->apiSetup
                 ->getCheckoutApi()
-                ->checkoutV2ControllerGetCheckoutPaymentV2($checkoutId, $maxRetries);
+                ->checkoutV2ControllerGetCheckoutPaymentV2($paymentId, $maxRetries);
         } catch (\Exception $error) {
             if ($this->isAuthenticationError($error)) {
                 $this->apiSetup->ensureAccessToken();
                 return $this->apiSetup
                     ->getCheckoutApi()
-                    ->checkoutV2ControllerGetCheckoutPaymentV2($checkoutId, $maxRetries);
+                    ->checkoutV2ControllerGetCheckoutPaymentV2($paymentId, $maxRetries);
             }
 
             throw $error;
@@ -211,8 +211,8 @@ class CheckoutServiceV2
      */
     private function validateUpdateCheckoutParams(array $params): void
     {
-        $checkoutID = $params['checkoutID'] ?? null;
-        Validators::uuid()->validateAndThrow($checkoutID !== null ? $checkoutID : null, 'Checkout Id');
+        $paymentId = $params['paymentID'] ?? null;
+        Validators::uuid()->validateAndThrow($paymentId !== null ? $paymentId : null, 'Payment Id');
 
         $currency = $params['currency'] ?? null;
         Validators::currency()->validateAndThrow($currency !== null ? strtoupper($currency) : null, 'Currency');
