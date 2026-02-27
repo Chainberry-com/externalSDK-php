@@ -7,8 +7,8 @@ All URIs are relative to http://0.0.0.0:3001/api/v2, except if the operation def
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
 | [**checkoutV2ControllerCreateCheckoutV2()**](CheckoutsApi.md#checkoutV2ControllerCreateCheckoutV2) | **POST** /checkouts |  |
-| [**checkoutV2ControllerGetCheckoutPaymentV2()**](CheckoutsApi.md#checkoutV2ControllerGetCheckoutPaymentV2) | **GET** /checkouts/payments/{checkoutId} |  |
-| [**checkoutV2ControllerGetCheckoutV2()**](CheckoutsApi.md#checkoutV2ControllerGetCheckoutV2) | **GET** /checkouts/{checkoutId} |  |
+| [**checkoutV2ControllerGetCheckoutPaymentV2()**](CheckoutsApi.md#checkoutV2ControllerGetCheckoutPaymentV2) | **GET** /checkouts/payments/{paymentId} |  |
+| [**checkoutV2ControllerGetCheckoutV2()**](CheckoutsApi.md#checkoutV2ControllerGetCheckoutV2) | **GET** /checkouts/{paymentId} |  |
 | [**checkoutV2ControllerUpdateCheckoutV2()**](CheckoutsApi.md#checkoutV2ControllerUpdateCheckoutV2) | **PATCH** /checkouts |  |
 
 
@@ -69,7 +69,7 @@ No authorization required
 ## `checkoutV2ControllerGetCheckoutPaymentV2()`
 
 ```php
-checkoutV2ControllerGetCheckoutPaymentV2($checkout_id): \OpenAPI\Client\Model\CheckoutPaymentResponseV2Dto
+checkoutV2ControllerGetCheckoutPaymentV2($payment_id): \OpenAPI\Client\Model\CheckoutPaymentResponseV2Dto
 ```
 
 
@@ -87,10 +87,10 @@ $apiInstance = new OpenAPI\Client\Api\CheckoutsApi(
     // This is optional, `GuzzleHttp\Client` will be used as default.
     new GuzzleHttp\Client()
 );
-$checkout_id = 'checkout_id_example'; // string
+$payment_id = 'payment_id_example'; // string
 
 try {
-    $result = $apiInstance->checkoutV2ControllerGetCheckoutPaymentV2($checkout_id);
+    $result = $apiInstance->checkoutV2ControllerGetCheckoutPaymentV2($payment_id);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling CheckoutsApi->checkoutV2ControllerGetCheckoutPaymentV2: ', $e->getMessage(), PHP_EOL;
@@ -101,7 +101,7 @@ try {
 
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **checkout_id** | **string**|  | |
+| **payment_id** | **string**|  | |
 
 ### Return type
 
@@ -123,7 +123,7 @@ No authorization required
 ## `checkoutV2ControllerGetCheckoutV2()`
 
 ```php
-checkoutV2ControllerGetCheckoutV2($checkout_id): \OpenAPI\Client\Model\CheckoutResponseV2Dto
+checkoutV2ControllerGetCheckoutV2($payment_id): \OpenAPI\Client\Model\CheckoutResponseV2Dto
 ```
 
 
@@ -145,10 +145,10 @@ $apiInstance = new OpenAPI\Client\Api\CheckoutsApi(
     new GuzzleHttp\Client(),
     $config
 );
-$checkout_id = 'checkout_id_example'; // string
+$payment_id = 'payment_id_example'; // string
 
 try {
-    $result = $apiInstance->checkoutV2ControllerGetCheckoutV2($checkout_id);
+    $result = $apiInstance->checkoutV2ControllerGetCheckoutV2($payment_id);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling CheckoutsApi->checkoutV2ControllerGetCheckoutV2: ', $e->getMessage(), PHP_EOL;
@@ -159,7 +159,7 @@ try {
 
 | Name | Type | Description  | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| **checkout_id** | **string**|  | |
+| **payment_id** | **string**|  | |
 
 ### Return type
 

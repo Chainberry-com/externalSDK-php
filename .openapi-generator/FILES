@@ -40,6 +40,7 @@ docs/Model/InitTestParamsDto.md
 docs/Model/KytFetchStatusDto.md
 docs/Model/KytMonitorNotificationDto.md
 docs/Model/PartnerDto.md
+docs/Model/PartnerResponseV2Dto.md
 docs/Model/PaymentResponseV2Dto.md
 docs/Model/PaymentResponseV2DtoCryptoTransactionInfoInner.md
 docs/Model/QuickNodeSubscribeDto.md
@@ -102,6 +103,7 @@ lib/Model/KytFetchStatusDto.php
 lib/Model/KytMonitorNotificationDto.php
 lib/Model/ModelInterface.php
 lib/Model/PartnerDto.php
+lib/Model/PartnerResponseV2Dto.php
 lib/Model/PaymentResponseV2Dto.php
 lib/Model/PaymentResponseV2DtoCryptoTransactionInfoInner.php
 lib/Model/QuickNodeSubscribeDto.php
@@ -123,16 +125,4 @@ lib/Model/WithdrawV2Dto.php
 lib/Model/WithdrawV2DtoCryptoTransactionInfoInner.php
 lib/ObjectSerializer.php
 phpunit.xml.dist
-test/Api/BroadcastApiTest.php
-test/Api/CheckoutsApiTest.php
-test/Api/QuicknodeApiTest.php
-test/Model/AddBroadcastUrlDtoTest.php
-test/Model/BroadcastV2ControllerAddBroadcastUrlV2200ResponseTest.php
-test/Model/BroadcastV2ControllerGetAllBroadcastUrlsV2200ResponseInnerTest.php
-test/Model/CheckoutPaymentResponseV2DtoTest.php
-test/Model/CheckoutResponseV2DtoTest.php
-test/Model/CreateCheckoutRequestDtoTest.php
-test/Model/QuickNodeSubscribeDtoTest.php
-test/Model/SettingsResponseV2DtoSupportedAssetsInnerTest.php
-test/Model/SettingsResponseV2DtoTest.php
-test/Model/UpdateCheckoutRequestDtoTest.php
+test/Model/PartnerResponseV2DtoTest.php

@@ -27,6 +27,21 @@ class Validators
             ->addRule(ValidationRules::pattern('/^\d+(\.\d+)?$/', "Amount must be a valid number"));
     }
 
+    /**
+     * @note: Its work work v4 only
+     */
+    public static function uuid(): Validator
+    {
+        return (new Validator())
+            ->addRule(ValidationRules::required("UUID is required"))
+            ->addRule(
+                ValidationRules::pattern(
+                    '/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/',
+                    "Value must be a valid UUID v4"
+                )
+            );
+    }
+
     public static function currency(): Validator
     {
         return (new Validator())

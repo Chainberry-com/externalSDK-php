@@ -3,6 +3,7 @@
 namespace OpenAPI\Client;
 
 use OpenAPI\Client\Api\AssetApi;
+use OpenAPI\Client\Api\CheckoutsApi;
 use OpenAPI\Client\Api\ConvertApi;
 use OpenAPI\Client\Api\DepositsApi as DepositsApiV2;
 use OpenAPI\ClientV1\Api\DepositsApi;
@@ -77,6 +78,7 @@ class ApiSetup
     private ?string $accessToken = null;
     private ?DepositsApi $depositsApi = null;
     private ?WithdrawApi $withdrawApi = null;
+    private ?CheckoutsApi $checkoutsApi = null;
 
     private const DEFAULT_BASE_URLS = [
         Environment::STAGING => [
@@ -168,6 +170,7 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
         $this->autoConversionApi = new AutoConversionApi(null, $this->configuration);
         $this->depositsApi = new DepositsApi(null, $this->configuration);
         $this->withdrawApi = new WithdrawApi(null, $this->configuration);
+        $this->checkoutsApi = new CheckoutsApi(null, $this->configurationV2);
 
         try {
             $this->testInit();
@@ -461,6 +464,16 @@ nm379RgOvoXx5qiIOZHdk2An9VwH4adrPowZvfcUXuLlNHerWsbAtreAMrw2Eb6s
     public function getDepositsApi(): DepositsApi
     {
         return $this->depositsApi;
+    }
+
+    /**
+     * Get Checkout API instance
+     *
+     * @return CheckoutsApi
+     */
+    public function getCheckoutApi(): CheckoutsApi
+    {
+        return $this->checkoutsApi;
     }
 
     /**
