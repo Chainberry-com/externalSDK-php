@@ -83,19 +83,20 @@ $config = [
 ### Environment and API Version Matrix (V1 vs V2)
 
 The SDK uses two separate configuration values:
+
 - **Environment** (`CB_API_ENVIRONMENT` or `$config['environment']`): The deployment environment (staging, production, or local)
 - **API Version** (`CB_API_VERSION` or `$config['apiVersion']`): The API version to use (v1 or v2)
 
 Both values are combined to determine the base URL. The API version defaults to `v1` if not specified.
 
-| Environment   | Constant                      | API Version | Base URL                                    | Typical use case                 |
-| ------------- | ----------------------------- | ----------- | ------------------------------------------- | -------------------------------- |
-| `staging`     | `Environment::STAGING`        | `v1`        | `https://api-stg.chainberry.com/api/v1`     | Legacy flows in staging          |
-| `staging`     | `Environment::STAGING`        | `v2`        | `https://api-stg.chainberry.com/api/v2`     | New V2 flows in staging          |
-| `production`  | `Environment::PRODUCTION`     | `v1`        | `https://api.chainberry.com/api/v1`         | Legacy flows in production       |
-| `production`  | `Environment::PRODUCTION`     | `v2`        | `https://api.chainberry.com/api/v2`         | New V2 flows in production       |
-| `local`       | `Environment::LOCAL`          | `v1`        | `http://192.168.0.226:3001/api/v1`          | Local V1 gateway                 |
-| `local`       | `Environment::LOCAL`          | `v2`        | `http://192.168.0.226:3001/api/v2`          | Local V2 gateway                 |
+| Environment  | Constant                  | API Version | Base URL                                | Typical use case           |
+| ------------ | ------------------------- | ----------- | --------------------------------------- | -------------------------- |
+| `staging`    | `Environment::STAGING`    | `v1`        | `https://api-stg.chainberry.com/api/v1` | Legacy flows in staging    |
+| `staging`    | `Environment::STAGING`    | `v2`        | `https://api-stg.chainberry.com/api/v2` | New V2 flows in staging    |
+| `production` | `Environment::PRODUCTION` | `v1`        | `https://api.chainberry.com/api/v1`     | Legacy flows in production |
+| `production` | `Environment::PRODUCTION` | `v2`        | `https://api.chainberry.com/api/v2`     | New V2 flows in production |
+| `local`      | `Environment::LOCAL`      | `v1`        | `http://192.168.0.226:3001/api/v1`      | Local V1 gateway           |
+| `local`      | `Environment::LOCAL`      | `v2`        | `http://192.168.0.226:3001/api/v2`      | Local V2 gateway           |
 
 > You can call both V1 and V2 helpers from the same process, but make sure the `CB_API_VERSION` (or `$config['apiVersion']`) matches the endpoints you want to invoke. Mixing V1 helpers with a V2 API version (or vice versa) will result in authentication failures.
 
@@ -145,9 +146,18 @@ $withdraw = BerrySdk::createWithdrawV2([
     'network' => 'TRX',
 ]);
 
+// Create a checkout (V2)
+$checkout = BerrySdk::createCheckoutV2([
+    'amountUsd' => '50.00',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'partnerUserID' => 'user123',
+    'partnerPaymentID' => 'payment123',
+]);
+
 // Fetch existing records (V2)
 $depositInfo = BerrySdk::getDepositV2('payment_id');
 $withdrawInfo = BerrySdk::getWithdrawV2('payment_id');
+$checkoutInfo = BerrySdk::getCheckoutV2('payment_id');
 ```
 
 ### V1 Quick Start Examples (Legacy)
@@ -314,6 +324,46 @@ $withdraw = $withdrawService->createWithdraw([
 $withdrawInfo = $withdrawService->getWithdraw('payment_id', 3); // 3 retries
 ```
 
+### Using the Checkout Service
+
+```php
+<?php
+
+use OpenAPI\Client\Services\CheckoutServiceV2;
+
+// Initialize the SDK first
+BerrySdk::init();
+
+// Create checkout service
+$checkoutService = new CheckoutServiceV2();
+
+// Get signed checkout request
+$signedRequest = $checkoutService->getSignedCheckoutRequest([
+    'amountUsd' => '50.00',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'partnerUserID' => 'user123',
+    'partnerPaymentID' => 'payment123',
+]);
+
+// Create checkout
+$checkout = $checkoutService->createCheckout([
+    'amountUsd' => '50.00',
+    'callbackUrl' => 'https://your-callback-url.com/webhook',
+    'partnerUserID' => 'user123',
+    'partnerPaymentID' => 'payment123',
+]);
+
+// Update checkout with currency and network
+$updatedCheckout = $checkoutService->updateCheckout([
+    "paymentID" => 'payment_id',
+    "currency" => "USDC",
+    "network" => "ETH"
+]);
+
+// Get checkout with retry logic
+$checkoutInfo = $checkoutService->getCheckout('payment_id', 3); // 3 retries
+```
+
 ### Error Handling
 
 ```php
@@ -447,144 +497,89 @@ try {
 
 ## API Endpoints
 
-All URIs are relative to _http://localhost:3001/api/v1_
+All URIs are relative to *http://0.0.0.0:3001/api/v2*
 
-| Class               | Method                                                                                                                         | HTTP request                              | Description                                                                                           |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| _AssetApi_          | [**assetV2ControllerGetSupportedAssetsV2**](docs/Api/AssetApi.md#assetv2controllergetsupportedassetsv2)                        | **GET** /asset                            |
-| _ConvertApi_        | [**autoConversionV2ControllerAutoConversionV2**](docs/Api/ConvertApi.md#autoconversionv2controllerautoconversionv2)             | **POST** /convert                         |
-| _BinanceApi_        | [**binanceControllerExecuteTradingWorkflow**](docs/Api/BinanceApi.md#binancecontrollerexecutetradingworkflow)                  | **POST** /binance/workflow/execute        |
-| _BinanceApi_        | [**binanceControllerGetAveragePrice**](docs/Api/BinanceApi.md#binancecontrollergetaverageprice)                                | **GET** /binance/average-price/{symbol}   |
-| _BinanceApi_        | [**binanceControllerGetAveragePrices**](docs/Api/BinanceApi.md#binancecontrollergetaverageprices)                              | **GET** /binance/average-prices           |
-| _BinanceApi_        | [**binanceControllerGetCommonAveragePrices**](docs/Api/BinanceApi.md#binancecontrollergetcommonaverageprices)                  | **GET** /binance/common-average-prices    |
-| _BinanceApi_        | [**binanceControllerGetWithdrawFee**](docs/Api/BinanceApi.md#binancecontrollergetwithdrawfee)                                  | **GET** /binance/withdraw-fee/{currency}  |
-| _BinanceApi_        | [**binanceControllerValidateSymbol**](docs/Api/BinanceApi.md#binancecontrollervalidatesymbol)                                  | **GET** /binance/validate-symbol/{symbol} |
-| _BinanceApi_        | [**binanceControllerWithdrawToFireblocks**](docs/Api/BinanceApi.md#binancecontrollerwithdrawtofireblocks)                      | **POST** /binance/withdraw                |
-| _DepositsApi_       | [**depositV2ControllerCreateDepositV2**](docs/Api/DepositsApi.md#depositv2controllercreatedepositv2)                           | **POST** /deposits                        |
-| _DepositsApi_       | [**depositV2ControllerGetDepositV2**](docs/Api/DepositsApi.md#depositv2controllergetdepositv2)                                 | **GET** /deposits/{paymentId}             |
-| _DepositsApi_       | [**depositV2ControllerGetDepositPaymentV2**](docs/Api/DepositsApi.md#depositv2controllergetdepositpaymentv2)                   | **GET** /deposits/payments/{paymentId}    |
-| _DepositsApi_       | [**depositControllerSetupSupportingAssets**](docs/Api/DepositsApi.md#depositcontrollersetupsupportingassets)                   | **GET** /deposits/setup-supporting-assets |
-| _DepositsApi_       | [**depositControllerSyncUpWithFireblocks**](docs/Api/DepositsApi.md#depositcontrollersyncupwithfireblocks)                     | **GET** /deposits/sync-up-with-fireblocks |
-| _HealthApi_         | [**appControllerHealth**](docs/Api/HealthApi.md#appcontrollerhealth)                                                           | **GET** /health                           | Get the health of the API                                                                             |
-| _KytApi_            | [**kytControllerHandleMonitorNotification**](docs/Api/KytApi.md#kytcontrollerhandlemonitornotification)                        | **POST** /kyt                             | Process KYT monitor notification                                                                      |
-| _OauthApi_          | [**oAuthV2ControllerTokenV2**](docs/Api/OauthApi.md#oauthv2controllertokenv2)                                                  | **POST** /oauth/token                     |
-| _PartnersApi_       | [**partnerControllerGetCurrentPartner**](docs/Api/PartnersApi.md#partnercontrollergetcurrentpartner)                           | **GET** /partners/me                      |
-| _PublicKeyApi_      | [**publicKeyControllerDownloadPublicKey**](docs/Api/PublicKeyApi.md#publickeycontrollerdownloadpublickey)                      | **GET** /public-key                       |
-| _SideshiftApi_      | [**sideShiftControllerCreateVariableShift**](docs/Api/SideshiftApi.md#sideshiftcontrollercreatevariableshift)                  | **POST** /sideshift/shifts/variable       |
-| _SideshiftApi_      | [**sideShiftControllerGetPair**](docs/Api/SideshiftApi.md#sideshiftcontrollergetpair)                                          | **GET** /sideshift/pair/{from}/{to}       |
-| _SideshiftApi_      | [**sideShiftControllerGetShift**](docs/Api/SideshiftApi.md#sideshiftcontrollergetshift)                                        | **GET** /sideshift/shifts/{shiftId}       |
-| _TestApi_           | [**testV2ControllerInitParamsV2**](docs/Api/TestApi.md#testv2controllerinitparamsv2)                                           | **POST** /test/init-params                | Test the init params with JWT token and apiToken                                                      |
-| _TestApi_           | [**testControllerTestCallback**](docs/Api/TestApi.md#testcontrollertestcallback)                                               | **POST** /test/callback                   |
-| _TestApi_           | [**testControllerTestJwt**](docs/Api/TestApi.md#testcontrollertestjwt)                                                         | **GET** /test/jwt                         | Test the API with JWT token                                                                           |
-| _TestApi_           | [**testControllerTestSignatureGeneration**](docs/Api/TestApi.md#testcontrollertestsignaturegeneration)                         | **POST** /test/signature-generation       | Test the API with signature generation                                                                |
-| _TestApi_           | [**testControllerTestSignatureVerificationMiddleware**](docs/Api/TestApi.md#testcontrollertestsignatureverificationmiddleware) | **POST** /test/signature-verification     | Test the API with signature verification middleware. Requires apiToken in body. ApiToken is partnerId |
-| _WebhookApi_        | [**webhookControllerHandleWebhook**](docs/Api/WebhookApi.md#webhookcontrollerhandlewebhook)                                    | **POST** /webhook                         |
-| _WithdrawApi_       | [**withdrawV2ControllerCreateWithdrawV2**](docs/Api/WithdrawApi.md#withdrawv2controllercreatewithdrawv2)                       | **POST** /withdraw                        |
-| _WithdrawApi_       | [**withdrawV2ControllerGetWithdrawV2**](docs/Api/WithdrawApi.md#withdrawv2controllergetwithdrawv2)                             | **GET** /withdraw/{paymentId}             |
+| Class                  | Method                                                                                                                                  | HTTP request                              | Description                                                                                           |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| _AssetApi_             | [**assetV2ControllerGetSupportedAssetsV2**](docs/Api/AssetApi.md#assetv2controllergetsupportedassetsv2)                                 | **GET** /asset                            |
+| _BroadcastApi_         | [**broadcastV2ControllerAddBroadcastUrlV2**](docs/Api/BroadcastApi.md#broadcastv2controlleraddbroadcasturlv2)                           | **POST** /broadcast                       | Add a new broadcast webhook URL                                                                       |
+| _BroadcastApi_         | [**broadcastV2ControllerDeleteBroadcastUrlV2**](docs/Api/BroadcastApi.md#broadcastv2controllerdeletebroadcasturlv2)                     | **DELETE** /broadcast/{id}                | Delete a broadcast webhook URL                                                                        |
+| _BroadcastApi_         | [**broadcastV2ControllerGetAllBroadcastUrlsV2**](docs/Api/BroadcastApi.md#broadcastv2controllergetallbroadcasturlsv2)                   | **GET** /broadcast                        | Get all broadcast webhook URLs                                                                        |
+| _CheckoutsApi_         | [**checkoutV2ControllerCreateCheckoutV2**](docs/Api/CheckoutsApi.md#checkoutv2controllercreatecheckoutv2)                               | **POST** /checkouts                       |
+| _CheckoutsApi_         | [**checkoutV2ControllerGetCheckoutPaymentV2**](docs/Api/CheckoutsApi.md#checkoutv2controllergetcheckoutpaymentv2)                       | **GET** /checkouts/payments/{paymentId}   |
+| _CheckoutsApi_         | [**checkoutV2ControllerGetCheckoutV2**](docs/Api/CheckoutsApi.md#checkoutv2controllergetcheckoutv2)                                     | **GET** /checkouts/{paymentId}            |
+| _CheckoutsApi_         | [**checkoutV2ControllerUpdateCheckoutV2**](docs/Api/CheckoutsApi.md#checkoutv2controllerupdatecheckoutv2)                               | **PATCH** /checkouts                      |
+| _ConvertApi_           | [**autoConversionV2ControllerAutoConversionV2**](docs/Api/ConvertApi.md#autoconversionv2controllerautoconversionv2)                     | **POST** /convert                         |
+| _DepositAddressApi_    | [**depositAddressControllerGetDepositAddressV2**](docs/Api/DepositAddressApi.md#depositaddresscontrollergetdepositaddressv2)            | **POST** /deposit-address                 |
+| _DepositsApi_          | [**depositV2ControllerCreateDepositV2**](docs/Api/DepositsApi.md#depositv2controllercreatedepositv2)                                    | **POST** /deposits                        |
+| _DepositsApi_          | [**depositV2ControllerGetDepositPaymentV2**](docs/Api/DepositsApi.md#depositv2controllergetdepositpaymentv2)                            | **GET** /deposits/payments/{paymentId}    |
+| _DepositsApi_          | [**depositV2ControllerGetDepositV2**](docs/Api/DepositsApi.md#depositv2controllergetdepositv2)                                          | **GET** /deposits/{paymentId}             |
+| _KytApi_               | [**kytV2ControllerFetchKytStatusesV2**](docs/Api/KytApi.md#kytv2controllerfetchkytstatusesv2)                                           | **POST** /kyt/fetch-kyt-statuses          |
+| _KytApi_               | [**kytV2ControllerHandleMonitorNotificationV2**](docs/Api/KytApi.md#kytv2controllerhandlemonitornotificationv2)                         | **POST** /kyt                             | Process KYT monitor notification                                                                      |
+| _OauthApi_             | [**oAuthV2ControllerTokenV2**](docs/Api/OauthApi.md#oauthv2controllertokenv2)                                                           | **POST** /oauth/token                     |
+| _PartnersApi_          | [**partnerV2ControllerGetSettingsV2**](docs/Api/PartnersApi.md#partnerv2controllergetsettingsv2)                                        | **GET** /partners/settings/{partnerId}    |
+| _PreWebhookApi_        | [**preWebhookV2ControllerHandlePreWebhookV2**](docs/Api/PreWebhookApi.md#prewebhookv2controllerhandleprewebhookv2)                      | **POST** /pre-webhook                     | Pre-process indexer webhook events                                                                    |
+| _PublicKeyApi_         | [**publicKeyV2ControllerDownloadPublicKeyV2**](docs/Api/PublicKeyApi.md#publickeyv2controllerdownloadpublickeyv2)                       | **GET** /public-key                       |
+| _QuicknodeApi_         | [**quickNodeControllerSubscribeV2**](docs/Api/QuicknodeApi.md#quicknodecontrollersubscribev2)                                           | **POST** /quicknode/subscribe             |
+| _TestApi_              | [**testV2ControllerInitParamsV2**](docs/Api/TestApi.md#testv2controllerinitparamsv2)                                                    | **POST** /test/init-params                | Test the init params with JWT token and apiToken                                                      |
+| _TestApi_              | [**testV2ControllerTestCallbackV2**](docs/Api/TestApi.md#testv2controllertestcallbackv2)                                                | **POST** /test/callback                   |
+| _TestDevApi_           | [**devV2ControllerGetCurrentPartnerV2**](docs/Api/TestDevApi.md#devv2controllergetcurrentpartnerv2)                                     | **GET** /test/dev/partners/me             |
+| _TestDevApi_           | [**devV2ControllerTestJwtV2**](docs/Api/TestDevApi.md#devv2controllertestjwtv2)                                                         | **GET** /test/dev/jwt                     | Test the API with JWT token                                                                           |
+| _TestDevApi_           | [**devV2ControllerTestSignatureGenerationV2**](docs/Api/TestDevApi.md#devv2controllertestsignaturegenerationv2)                         | **POST** /test/dev/signature-generation   | Test the API with signature generation                                                                |
+| _TestDevApi_           | [**devV2ControllerTestSignatureVerificationMiddlewareV2**](docs/Api/TestDevApi.md#devv2controllertestsignatureverificationmiddlewarev2) | **POST** /test/dev/signature-verification | Test the API with signature verification middleware. Requires apiToken in body. ApiToken is partnerId |
+| _TestnetIndexerApi_    | [**testnetIndexerControllerSubscribeV2**](docs/Api/TestnetIndexerApi.md#testnetindexercontrollersubscribev2)                            | **POST** /testnet-indexer/subscribe       |
+| _TransactionDetailApi_ | [**transactionDetailControllerCreateV2**](docs/Api/TransactionDetailApi.md#transactiondetailcontrollercreatev2)                         | **POST** /transaction-detail              |
+| _TransactionDetailApi_ | [**transactionDetailControllerDeleteV2**](docs/Api/TransactionDetailApi.md#transactiondetailcontrollerdeletev2)                         | **DELETE** /transaction-detail/{id}       |
+| _TransactionDetailApi_ | [**transactionDetailControllerFindAllV2**](docs/Api/TransactionDetailApi.md#transactiondetailcontrollerfindallv2)                       | **GET** /transaction-detail               |
+| _TransactionDetailApi_ | [**transactionDetailControllerFindByHashV2**](docs/Api/TransactionDetailApi.md#transactiondetailcontrollerfindbyhashv2)                 | **GET** /transaction-detail/hash/{hash}   |
+| _TransactionDetailApi_ | [**transactionDetailControllerFindByIdV2**](docs/Api/TransactionDetailApi.md#transactiondetailcontrollerfindbyidv2)                     | **GET** /transaction-detail/{id}          |
+| _TransactionDetailApi_ | [**transactionDetailControllerUpdateV2**](docs/Api/TransactionDetailApi.md#transactiondetailcontrollerupdatev2)                         | **PUT** /transaction-detail/{id}          |
+| _UiCustomizationApi_   | [**uiCustomizationControllerGetCustomUiV2**](docs/Api/UiCustomizationApi.md#uicustomizationcontrollergetcustomuiv2)                     | **GET** /ui-customization/{paymentId}     |
+| _WebhookApi_           | [**webhookV2ControllerHandleWebhookV2**](docs/Api/WebhookApi.md#webhookv2controllerhandlewebhookv2)                                     | **POST** /webhook                         |
+| _WebhookApi_           | [**webhookV2ControllerHandleWebhookV2V2**](docs/Api/WebhookApi.md#webhookv2controllerhandlewebhookv2v2)                                 | **POST** /webhook/v2                      |
+| _WithdrawApi_          | [**withdrawV2ControllerCreateWithdrawV2**](docs/Api/WithdrawApi.md#withdrawv2controllercreatewithdrawv2)                                | **POST** /withdraw                        |
+| _WithdrawApi_          | [**withdrawV2ControllerGetWithdrawV2**](docs/Api/WithdrawApi.md#withdrawv2controllergetwithdrawv2)                                      | **GET** /withdraw/{paymentId}             |
 
 ## Models
 
+- [AddBroadcastUrlDto](docs/Model/AddBroadcastUrlDto.md)
 - [AutoConversionRequestV2Dto](docs/Model/AutoConversionRequestV2Dto.md)
 - [AutoConversionResponseV2Dto](docs/Model/AutoConversionResponseV2Dto.md)
-- [BinanceControllerGetAveragePrice200Response](docs/Model/BinanceControllerGetAveragePrice200Response.md)
-- [BinanceControllerGetWithdrawFee200Response](docs/Model/BinanceControllerGetWithdrawFee200Response.md)
-- [BinanceControllerValidateSymbol200Response](docs/Model/BinanceControllerValidateSymbol200Response.md)
-- [BinanceOrderResponseDto](docs/Model/BinanceOrderResponseDto.md)
-- [BinanceWithdrawRequestDto](docs/Model/BinanceWithdrawRequestDto.md)
-- [BinanceWithdrawResponseDto](docs/Model/BinanceWithdrawResponseDto.md)
-- [BinanceWorkflowConfigDto](docs/Model/BinanceWorkflowConfigDto.md)
-- [BinanceWorkflowResponseDto](docs/Model/BinanceWorkflowResponseDto.md)
+- [BroadcastV2ControllerAddBroadcastUrlV2200Response](docs/Model/BroadcastV2ControllerAddBroadcastUrlV2200Response.md)
+- [BroadcastV2ControllerGetAllBroadcastUrlsV2200ResponseInner](docs/Model/BroadcastV2ControllerGetAllBroadcastUrlsV2200ResponseInner.md)
+- [CheckoutPaymentResponseV2Dto](docs/Model/CheckoutPaymentResponseV2Dto.md)
+- [CheckoutResponseV2Dto](docs/Model/CheckoutResponseV2Dto.md)
+- [CreateCheckoutRequestDto](docs/Model/CreateCheckoutRequestDto.md)
+- [CreateTransactionDetailDto](docs/Model/CreateTransactionDetailDto.md)
+- [CustomUiDto](docs/Model/CustomUiDto.md)
+- [DepositAddressResponseDto](docs/Model/DepositAddressResponseDto.md)
 - [DepositRequestV2Dto](docs/Model/DepositRequestV2Dto.md)
 - [DepositResponseV2Dto](docs/Model/DepositResponseV2Dto.md)
+- [GetDepositAddressRequestDto](docs/Model/GetDepositAddressRequestDto.md)
+- [InitTestParamsDto](docs/Model/InitTestParamsDto.md)
+- [KytFetchStatusDto](docs/Model/KytFetchStatusDto.md)
+- [KytMonitorNotificationDto](docs/Model/KytMonitorNotificationDto.md)
+- [PartnerDto](docs/Model/PartnerDto.md)
+- [PartnerResponseV2Dto](docs/Model/PartnerResponseV2Dto.md)
 - [PaymentResponseV2Dto](docs/Model/PaymentResponseV2Dto.md)
 - [PaymentResponseV2DtoCryptoTransactionInfoInner](docs/Model/PaymentResponseV2DtoCryptoTransactionInfoInner.md)
+- [QuickNodeSubscribeDto](docs/Model/QuickNodeSubscribeDto.md)
+- [SettingsResponseV2Dto](docs/Model/SettingsResponseV2Dto.md)
+- [SettingsResponseV2DtoSupportedAssetsInner](docs/Model/SettingsResponseV2DtoSupportedAssetsInner.md)
+- [SubscribeRequestDto](docs/Model/SubscribeRequestDto.md)
+- [SubscribeResponseDto](docs/Model/SubscribeResponseDto.md)
+- [SuccessDto](docs/Model/SuccessDto.md)
+- [SupportedAssetDto](docs/Model/SupportedAssetDto.md)
+- [SupportedAssetInfo](docs/Model/SupportedAssetInfo.md)
+- [TokenRequestDto](docs/Model/TokenRequestDto.md)
+- [TokenResponseDto](docs/Model/TokenResponseDto.md)
+- [TransactionDetailResponseDto](docs/Model/TransactionDetailResponseDto.md)
+- [UpdateCheckoutRequestDto](docs/Model/UpdateCheckoutRequestDto.md)
+- [UpdateTransactionDetailDto](docs/Model/UpdateTransactionDetailDto.md)
 - [WithdrawRequestV2Dto](docs/Model/WithdrawRequestV2Dto.md)
 - [WithdrawResponseV2Dto](docs/Model/WithdrawResponseV2Dto.md)
 - [WithdrawV2Dto](docs/Model/WithdrawV2Dto.md)
 - [WithdrawV2DtoCryptoTransactionInfoInner](docs/Model/WithdrawV2DtoCryptoTransactionInfoInner.md)
-- [InitTestParamsDto](docs/Model/InitTestParamsDto.md)
-- [KytMonitorNotificationDto](docs/Model/KytMonitorNotificationDto.md)
-- [PartnerDto](docs/Model/PartnerDto.md)
-- [SideShiftPairResponseDto](docs/Model/SideShiftPairResponseDto.md)
-- [SideShiftShiftDepositDto](docs/Model/SideShiftShiftDepositDto.md)
-- [SideShiftShiftResponseDto](docs/Model/SideShiftShiftResponseDto.md)
-- [SideShiftVariableShiftRequestDto](docs/Model/SideShiftVariableShiftRequestDto.md)
-- [SideShiftVariableShiftResponseDto](docs/Model/SideShiftVariableShiftResponseDto.md)
-- [SuccessDto](docs/Model/SuccessDto.md)
-- [SupportedAssetDto](docs/Model/SupportedAssetDto.md)
-- [TokenRequestDto](docs/Model/TokenRequestDto.md)
-- [TokenResponseDto](docs/Model/TokenResponseDto.md)
-
-## API Reference
-
-### BerrySdk Class
-
-#### Static Methods
-
-- `init(?array $config = null): ApiSetup` - Initialize the SDK
-- `getApi(): ApiSetup` - Get the API setup instance
-- `getLogger(): Logger` - Get the logger instance
-- `createDeposit(array $params): \OpenAPI\Client\Model\DepositResponseV2Dto` - Create a deposit
-- `getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\PaymentResponseV2Dto` - Get deposit information
-- `createWithdraw(array $params): \OpenAPI\Client\Model\WithdrawResponseV2Dto` - Create a withdrawal
-- `getWithdraw(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\WithdrawV2Dto` - Get withdrawal information
-- `signPayload(array $payload, string $privateKey): array` - Sign a payload
-- `verifySignature(array $dataWithSignature, string $publicKey): bool` - Verify a signature
-- `reset(): void` - Reset the SDK instance
-
-### ApiSetup Class
-
-#### Methods
-
-- `getInstance(): ApiSetup` - Get singleton instance
-- `init(?array $config = null): ApiSetup` - Initialize with configuration
-- `getAccessToken(): ?string` - Get OAuth access token
-- `ensureAccessToken(): string` - Ensure access token is available
-- `getConfig(): ?ExternalApiConfig` - Get current configuration
-- `getAssetApi(): AssetApi` - Get Asset API instance
-- `getAutoConversionApi(): ConvertApi` - Get Auto Conversion API instance
-- `getDepositsApi(): DepositsApi` - Get Deposits API instance
-- `getWithdrawApi(): WithdrawApi` - Get Withdraw API instance
-- `getOauthApi(): OauthApi` - Get OAuth API instance
-- `getTestApi(): TestApi` - Get Test API instance
-
-### DepositService Class
-
-#### Methods
-
-- `getSignedDepositRequest(array $params): \OpenAPI\Client\Model\DepositRequestV2Dto` - Get signed deposit request
-- `createDeposit(array $params): \OpenAPI\Client\Model\DepositResponseV2Dto` - Create and submit deposit
-- `getDeposit(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\PaymentResponseV2Dto` - Get deposit with retry
-- `getDepositWithEnvAuth(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\PaymentResponseV2Dto` - Get deposit with env auth
-
-### WithdrawService Class
-
-#### Methods
-
-- `getSignedWithdrawRequest(array $params): \OpenAPI\Client\Model\WithdrawRequestV2Dto` - Get signed withdrawal request
-- `createWithdraw(array $params): \OpenAPI\Client\Model\WithdrawResponseV2Dto` - Create and submit withdrawal
-- `getWithdraw(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\WithdrawV2Dto` - Get withdrawal with retry
-- `getWithdrawWithEnvAuth(string $paymentId, int $maxRetries = 2): \OpenAPI\Client\Model\WithdrawV2Dto` - Get withdrawal with env auth
-
-### CryptoUtils Class
-
-#### Static Methods
-
-- `signPayload(array $payload, string $privateKey): array` - Sign payload with private key
-- `verifySignature(array $dataWithSignature, string $publicKey): bool` - Verify signature
-
-## Error Classes
-
-- `BerrySdkError` - Base error class
-- `ConfigurationError` - Configuration related errors
-- `AuthenticationError` - Authentication related errors
-- `ApiError` - API request related errors
-- `ValidationError` - Validation related errors
-- `CryptoError` - Crypto/signature related errors
-- `NetworkError` - Network/connection related errors
-- `RateLimitError` - Rate limiting errors
-- `BadRequestError` - Bad request errors
-- `UnauthorizedError` - Unauthorized errors
 
 ## Authorization
 
@@ -594,9 +589,11 @@ Authentication schemes defined for the API:
 
 - **Type**: Bearer authentication (JWT)
 
-## Examples
+### api-key
 
-See the `examples/` directory for complete working examples.
+- **Type**: API key
+- **API key parameter name**: x-api-key
+- **Location**: HTTP header
 
 ## Tests
 
@@ -607,22 +604,12 @@ composer install
 vendor/bin/phpunit
 ```
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License.
+## Author
 
 ## About this package
 
 This PHP package is automatically generated by the [OpenAPI Generator](https://openapi-generator.tech) project:
 
-- API version: `1.15`
-  - Generator version: `7.14.0`
+- API version: `2.23`
+  - Generator version: `7.17.0`
 - Build package: `org.openapitools.codegen.languages.PhpClientCodegen`
